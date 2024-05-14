@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductDTO;
+import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.stock.Stock;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
@@ -29,6 +30,15 @@ public class ProductService {
 	private ModelMapper mapper;
 
 
+	public ProductResponseDTO getProduct(Long id) {
+		Product product = productRepository
+				.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
+		
+		return mapper.map(product, ProductResponseDTO.class);
+	}
+	
+	
 	public void createProduct(ProductDTO dto) {
 		Product produto = mapper.map(dto, Product.class);
 		
