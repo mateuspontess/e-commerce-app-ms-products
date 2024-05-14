@@ -21,6 +21,7 @@ import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
 import br.com.ecommerce.products.model.stock.Stock;
+import br.com.ecommerce.products.model.stock.StockDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
 import br.com.ecommerce.products.repository.StockRepository;
@@ -110,6 +111,13 @@ public class ProductService {
 			return;
 		}
 		original.update(updateData);
+	}
+	
+	public void subtractUnitsInStock(Long id, StockDTO dto) {
+		Product original = productRepository.getReferenceById(id);
+		Stock stockUpdate = mapper.map(dto, Stock.class);
+		
+		original.getStock().updateStock(stockUpdate.getUnit());
 	}
 	
 	
