@@ -1,8 +1,11 @@
 package br.com.ecommerce.products.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +50,16 @@ public class ProductController {
 		
 		return ResponseEntity.ok(service
 				.getAllProductWithParams(pageable, name, category, minPrice, maxPrice, manufacturer));
+	}
+	
+	@PostMapping("/specs")
+	public ResponseEntity<?> readAllBySpecs(
+			@PageableDefault(size = 10) Pageable pageable,
+			@RequestBody List<Map<String, String>> map
+			) {
+		
+		Page<ProductResponseDTO> dtos = service.getAllBySpecs(pageable, map);
+		return ResponseEntity.ok(dtos);
 	}
 	
 	@PostMapping

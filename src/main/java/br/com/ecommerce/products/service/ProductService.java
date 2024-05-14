@@ -2,6 +2,7 @@ package br.com.ecommerce.products.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,13 @@ public class ProductService {
 		return productRepository
 				.findAllByParams(pageable, name, category, minPrice, maxPrice, manufacturer)
 				.map(p -> new ProductResponseDTO(p));
+	}
+	
+	public Page<ProductResponseDTO> getAllBySpecs(Pageable pageable, List<Map<String, String>> map) {
+		return productRepository
+				.findProductsBySpecs(pageable, map)
+				.map(p -> new ProductResponseDTO(p));
+		
 	}
 	
 	
