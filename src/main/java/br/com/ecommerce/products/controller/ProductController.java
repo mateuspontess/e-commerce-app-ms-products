@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,7 @@ import br.com.ecommerce.products.model.product.ProductAndPriceDTO;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
+import br.com.ecommerce.products.model.product.ProductUpdateDTO;
 import br.com.ecommerce.products.model.stock.StockResponseDTO;
 import br.com.ecommerce.products.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -88,6 +90,15 @@ public class ProductController {
 				.map(p -> new ProductAndPriceDTO(p.getId(), p.getPrice()))
 				.toList());
 	}
+	
+	
+	@PutMapping("/{productId}")
+	@Transactional
+	public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductUpdateDTO dto) {
+		service.updateProduct(productId, dto);
+		return ResponseEntity.ok().build();
+	}
+	
 	
 	@PostMapping
 	@Transactional
