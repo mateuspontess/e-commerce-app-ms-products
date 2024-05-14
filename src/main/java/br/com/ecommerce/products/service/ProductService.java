@@ -1,8 +1,10 @@
 package br.com.ecommerce.products.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductDTO;
+import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.stock.Stock;
@@ -63,6 +66,27 @@ public class ProductService {
 		
 	}
 	
+	public List<Product> verifyStocks(List<ProductIdAndUnitsDTO> productsRequest) {
+		List<Product> products = this.getAllProductsByListOfIds(productsRequest);
+		if (products.isEmpty())
+			throw new EntityNotFoundException("No entities were found");
+		
+		List<Product> outOfStocks = new ArrayList<Product>();
+		Map<Long, ProductIdAndUnitsDTO> map = productsRequest.stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
+		
+		products.forEach(p -> {
+			if(p.getStock().getUnit() < map.get(p.getId()).getUnit()) {
+				outOfStocks.add(p);
+			}
+		});
+		
+		return outOfStocks;
+	}
+	
+	public List<Product> getAllProductsByListOfIds(List<ProductIdAndUnitsDTO> productsRequest) {
+		List<Long> productsIds = productsRequest.stream().map(ProductIdAndUnitsDTO::getId).toList();
+		return productRepository.findAllById(productsIds);
+	}
 	
 	public void createProduct(ProductDTO dto) {
 		Product produto = mapper.map(dto, Product.class);
