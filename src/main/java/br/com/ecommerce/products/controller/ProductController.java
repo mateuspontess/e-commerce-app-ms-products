@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
+import br.com.ecommerce.products.model.product.ProductAndPriceDTO;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
@@ -55,6 +56,7 @@ public class ProductController {
 				.getAllProductWithParams(pageable, name, category, minPrice, maxPrice, manufacturer));
 	}
 	
+	
 	@PostMapping("/specs")
 	public ResponseEntity<?> readAllBySpecs(
 			@PageableDefault(size = 10) Pageable pageable,
@@ -64,6 +66,7 @@ public class ProductController {
 		Page<ProductResponseDTO> dtos = service.getAllBySpecs(pageable, map);
 		return ResponseEntity.ok(dtos);
 	}
+
 	@PostMapping("/stocks")
 	public ResponseEntity<?> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
 		List<Product> outOfStock = service.verifyStocks(dto);
@@ -78,6 +81,14 @@ public class ProductController {
 		
 		return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(responseBody);
 	}
+	
+	@PostMapping("/prices")
+	public ResponseEntity<List<ProductAndPriceDTO>> getPrices(@RequestBody @Valid List<ProductIdAndUnitsDTO> productsIds){
+		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
+				.map(p -> new ProductAndPriceDTO(p.getId(), p.getPrice()))
+				.toList());
+	}
+	
 	@PostMapping
 	@Transactional
 	public ResponseEntity<?> createProdut(@RequestBody @Valid ProductDTO dto) {
