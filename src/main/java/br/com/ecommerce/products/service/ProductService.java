@@ -1,12 +1,16 @@
 package br.com.ecommerce.products.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
+import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
@@ -36,6 +40,19 @@ public class ProductService {
 				.orElseThrow(EntityNotFoundException::new);
 		
 		return mapper.map(product, ProductResponseDTO.class);
+	}
+	
+	public Page<ProductResponseDTO> getAllProductWithParams(
+			Pageable pageable, 
+			String name, 
+			Category category, 
+			BigDecimal minPrice, 
+			BigDecimal maxPrice,
+			String manufacturer) {
+		
+		return productRepository
+				.findAllByParams(pageable, name, category, minPrice, maxPrice, manufacturer)
+				.map(p -> new ProductResponseDTO(p));
 	}
 	
 	
