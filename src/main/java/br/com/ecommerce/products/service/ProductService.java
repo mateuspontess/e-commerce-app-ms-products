@@ -22,6 +22,7 @@ import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
 import br.com.ecommerce.products.model.stock.Stock;
 import br.com.ecommerce.products.model.stock.StockDTO;
+import br.com.ecommerce.products.model.stock.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
 import br.com.ecommerce.products.repository.StockRepository;
@@ -118,6 +119,15 @@ public class ProductService {
 		Stock stockUpdate = mapper.map(dto, Stock.class);
 		
 		original.getStock().updateStock(stockUpdate.getUnit());
+	}
+	public void updateStocks(List<StockWriteOffDTO> dto) {
+		Map<Long, Integer> writeOffValueMap = dto.stream()
+				.collect(Collectors.toMap(StockWriteOffDTO::getProductId, StockWriteOffDTO::getUnit));
+		
+		productRepository.findAllById(dto.stream()
+				.map(StockWriteOffDTO::getProductId)
+				.toList()
+				).forEach(p -> p.getStock().updateStock(writeOffValueMap.get(p.getId())));
 	}
 	
 	
