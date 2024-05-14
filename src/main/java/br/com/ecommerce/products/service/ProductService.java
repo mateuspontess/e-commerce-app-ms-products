@@ -19,6 +19,7 @@ import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
+import br.com.ecommerce.products.model.product.ProductUpdateDTO;
 import br.com.ecommerce.products.model.stock.Stock;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
@@ -87,6 +88,30 @@ public class ProductService {
 		List<Long> productsIds = productsRequest.stream().map(ProductIdAndUnitsDTO::getId).toList();
 		return productRepository.findAllById(productsIds);
 	}
+	
+	
+	public void updateProduct(Long id, ProductUpdateDTO dto) {
+		Product original = productRepository.getReferenceById(id);
+		Product updateData = mapper.map(dto, Product.class);
+		
+		if (updateData.getManufacturer() != null) {
+			Manufacturer previousManufacturer = mRepository
+					.getReferenceById(original.getManufacturer().getId());
+			previousManufacturer.getProducts().remove(original);	
+			
+			Manufacturer newManufacturer = mRepository
+					.findByName(updateData.getManufacturer().getName())
+					.orElseThrow(EntityNotFoundException::new);
+			
+			updateData.setManufacturer(newManufacturer);
+			newManufacturer.getProducts().add(original);
+			original.update(updateData);
+			mRepository.save(newManufacturer);
+			return;
+		}
+		original.update(updateData);
+	}
+	
 	
 	public void createProduct(ProductDTO dto) {
 		Product produto = mapper.map(dto, Product.class);
