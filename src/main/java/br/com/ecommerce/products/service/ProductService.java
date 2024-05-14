@@ -1,7 +1,6 @@
 package br.com.ecommerce.products.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,7 +44,7 @@ public class ProductService {
 		Product product = productRepository
 				.findById(id)
 				.orElseThrow(EntityNotFoundException::new);
-		
+
 		return mapper.map(product, ProductResponseDTO.class);
 	}
 	
@@ -59,59 +58,56 @@ public class ProductService {
 		
 		return productRepository
 				.findAllByParams(pageable, name, category, minPrice, maxPrice, manufacturer)
-				.map(p -> new ProductResponseDTO(p));
+				.map(ProductResponseDTO::new);
 	}
 	
 	public Page<ProductResponseDTO> getAllBySpecs(Pageable pageable, List<Map<String, String>> map) {
 		return productRepository
 				.findProductsBySpecs(pageable, map)
-				.map(p -> new ProductResponseDTO(p));
+				.map(ProductResponseDTO::new);
 		
 	}
 	
 	public List<Product> verifyStocks(List<ProductIdAndUnitsDTO> productsRequest) {
-		List<Product> products = this.getAllProductsByListOfIds(productsRequest);
-		if (products.isEmpty())
-			throw new EntityNotFoundException("No entities were found");
+		Map<Long, Integer> unitiesRequested = productsRequest.stream()
+				.collect(Collectors.toMap(p -> p.getId(), p -> p.getUnit()));
 		
-		List<Product> outOfStocks = new ArrayList<Product>();
-		Map<Long, ProductIdAndUnitsDTO> map = productsRequest.stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
-		
-		products.forEach(p -> {
-			if(p.getStock().getUnit() < map.get(p.getId()).getUnit()) {
-				outOfStocks.add(p);
-			}
-		});
-		
-		return outOfStocks;
+		return this.getAllProductsByListOfIds(productsRequest).stream()
+					.findFirst()
+					.stream()
+					.filter(p -> p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
+					.collect(Collectors.toList());
 	}
 	
 	public List<Product> getAllProductsByListOfIds(List<ProductIdAndUnitsDTO> productsRequest) {
-		List<Long> productsIds = productsRequest.stream().map(ProductIdAndUnitsDTO::getId).toList();
-		return productRepository.findAllById(productsIds);
+		return productRepository.findAllById(
+				productsRequest.stream()
+					.map(ProductIdAndUnitsDTO::getId)
+					.toList()
+				);
 	}
 	
 	
 	public void updateProduct(Long id, ProductUpdateDTO dto) {
-		Product original = productRepository.getReferenceById(id);
-		Product updateData = mapper.map(dto, Product.class);
+		Product currentProduct = productRepository.getReferenceById(id);
+		Product update = mapper.map(dto, Product.class);
 		
-		if (updateData.getManufacturer() != null) {
+		if (update.getManufacturer() != null) {
 			Manufacturer previousManufacturer = mRepository
-					.getReferenceById(original.getManufacturer().getId());
-			previousManufacturer.getProducts().remove(original);	
+					.getReferenceById(currentProduct.getManufacturer().getId());
+			previousManufacturer.getProducts().remove(currentProduct);	
 			
 			Manufacturer newManufacturer = mRepository
-					.findByName(updateData.getManufacturer().getName())
+					.findByName(update.getManufacturer().getName())
 					.orElseThrow(EntityNotFoundException::new);
 			
-			updateData.setManufacturer(newManufacturer);
-			newManufacturer.getProducts().add(original);
-			original.update(updateData);
+			update.setManufacturer(newManufacturer);
+			newManufacturer.getProducts().add(currentProduct);
+			currentProduct.update(update);
 			mRepository.save(newManufacturer);
 			return;
 		}
-		original.update(updateData);
+		currentProduct.update(update);
 	}
 	
 	public void subtractUnitsInStock(Long id, StockDTO dto) {
@@ -132,20 +128,20 @@ public class ProductService {
 	
 	
 	public void createProduct(ProductDTO dto) {
-		Product produto = mapper.map(dto, Product.class);
+		Product product = mapper.map(dto, Product.class);
 		
-		this.setManufacturer(produto);
-		this.createStock(produto);
-		this.createSpec(produto);
+		this.setManufacturer(product);
+		this.createStock(product);
+		this.createSpec(product);
 		
-		productRepository.save(produto);
+		productRepository.save(product);
 	}
-	private void setManufacturer(Product produto) {
+	private void setManufacturer(Product product) {
 		Manufacturer mf = mRepository
-				.findByName(produto.getManufacturer().getName().toUpperCase())
+				.findByName(product.getManufacturer().getName().toUpperCase())
 				.orElseThrow(EntityNotFoundException::new);
 		
-		produto.setManufacturer(mf);
+		product.setManufacturer(mf);
 	}
 	private void createStock(Product product) {
 		Stock stock = product.getStock();
