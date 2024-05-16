@@ -40,11 +40,11 @@ public class ProductController {
 	private ProductService service;
 	
 	
-	
 	@GetMapping("/{productId}")
 	public ResponseEntity<ProductResponseDTO> read(@PathVariable Long productId){
 		return ResponseEntity.ok(service.getProduct(productId));
 	}
+	
 	@GetMapping
 	public ResponseEntity<?> readAllWithParams(
 			@PageableDefault(size = 10) Pageable pageable,
@@ -92,6 +92,13 @@ public class ProductController {
 				.toList());
 	}
 	
+	@PostMapping
+	@Transactional
+	public ResponseEntity<?> createProdut(@RequestBody @Valid ProductDTO dto) {
+		service.createProduct(dto);
+		return ResponseEntity.ok().build();
+	}
+	
 	
 	@PutMapping("/{productId}")
 	@Transactional
@@ -99,18 +106,11 @@ public class ProductController {
 		service.updateProduct(productId, dto);
 		return ResponseEntity.ok().build();
 	}
+	
 	@PutMapping("/{productId}/stocks")
 	@Transactional
 	public ResponseEntity<?> updateStock(@PathVariable Long productId, @RequestBody @Valid StockDTO dto) {
 		service.subtractUnitsInStock(productId, dto);
-		return ResponseEntity.ok().build();
-	}
-	
-	
-	@PostMapping
-	@Transactional
-	public ResponseEntity<?> createProdut(@RequestBody @Valid ProductDTO dto) {
-		service.createProduct(dto);
 		return ResponseEntity.ok().build();
 	}
 }
