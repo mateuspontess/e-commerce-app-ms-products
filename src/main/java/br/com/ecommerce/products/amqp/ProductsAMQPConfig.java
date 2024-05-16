@@ -42,11 +42,11 @@ public class ProductsAMQPConfig {
 	static class Receiver {
 		@Bean
 		DirectExchange discoverExchangePedidos() {
-			return ExchangeBuilder.directExchange("pedidos.criacao.ex").build();
+			return ExchangeBuilder.directExchange("orders.create.ex").build();
 		}
 		@Bean
 		Queue filaStockProdutos() {
-			return QueueBuilder.nonDurable("produtos.stock-pedidos").build();
+			return QueueBuilder.nonDurable("products.stock-orders").build();
 		}
 		@Bean
 		Binding bindPedidos() {

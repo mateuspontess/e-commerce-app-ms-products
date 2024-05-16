@@ -18,7 +18,7 @@ public class ProductsListener {
 	private ProductService service;
 	
 	
-	@RabbitListener(queues = "produtos.stock-pedidos")
+	@RabbitListener(queues = "products.stock-orders")
 	@Transactional
 	public void receibeQueueMessageOrder(@Payload List<StockWriteOffDTO> dto) {
 		service.updateStocks(dto);
