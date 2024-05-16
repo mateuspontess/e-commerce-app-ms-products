@@ -73,9 +73,7 @@ public class ProductService {
 				.collect(Collectors.toMap(p -> p.getId(), p -> p.getUnit()));
 		
 		return this.getAllProductsByListOfIds(productsRequest).stream()
-					.findFirst()
-					.stream()
-					.filter(p -> p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
+					.filter(p -> p != null && p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
 					.collect(Collectors.toList());
 	}
 	
