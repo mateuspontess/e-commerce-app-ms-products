@@ -26,13 +26,14 @@ import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
 @ToString
 @Entity(name = "Product")
 @Table(name = "products")
 public class Product {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private String description;
@@ -44,7 +45,9 @@ public class Product {
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	private Stock stock;
 	
-	@ManyToOne @JoinColumn(name = "manufacturer_id")
+	@Setter
+	@ManyToOne 
+	@JoinColumn(name = "manufacturer_id")
 	private Manufacturer manufacturer;
 	
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
