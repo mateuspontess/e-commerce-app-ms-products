@@ -22,7 +22,8 @@ import lombok.Setter;
 @Table(name = "manufacturers", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
 public class Manufacturer {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String name;
