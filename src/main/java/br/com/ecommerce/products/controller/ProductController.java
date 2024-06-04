@@ -62,7 +62,6 @@ public class ProductController {
 	
 	
 	@PostMapping("/specs")
-	@Transactional
 	public ResponseEntity<?> readAllBySpecs(
 			@PageableDefault(size = 10) Pageable pageable,
 			@RequestBody List<Map<String, String>> map
@@ -73,7 +72,6 @@ public class ProductController {
 	}
 
 	@PostMapping("/stocks")
-	@Transactional
 	public ResponseEntity<?> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
 		List<Product> outOfStock = service.verifyStocks(dto);
 		
@@ -89,7 +87,6 @@ public class ProductController {
 	}
 	
 	@PostMapping("/prices")
-	@Transactional
 	public ResponseEntity<List<ProductAndPriceDTO>> getPrices(@RequestBody @Valid List<ProductIdAndUnitsDTO> productsIds){
 		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
 				.map(p -> new ProductAndPriceDTO(p.getId(), p.getPrice()))
