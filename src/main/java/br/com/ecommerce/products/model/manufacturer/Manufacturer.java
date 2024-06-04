@@ -25,7 +25,7 @@ public class Manufacturer {
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private String name;
 	
 	@OneToMany(mappedBy = "manufacturer", fetch = FetchType.LAZY)
@@ -36,13 +36,21 @@ public class Manufacturer {
 		this.name = name.toUpperCase();
 	}
 	
-	public void update(String name) {
+	public void updateName(String name) {
 		if (name != null && !name.isBlank())
 			this.name = name.toUpperCase();
+	}
+
+	public void addProduct(Product product) {
+		this.products.add(product);
+	}
+
+	public void removeProduct(Product product) {
+		this.products.remove(product);
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("Manufacturer(id=%d, name=%s)", this.id, this.name);
+		return String.format("Manufacturer[id=%d, name=%s]", this.id, this.name);
 	}
 }
