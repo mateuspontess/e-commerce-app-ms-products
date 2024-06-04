@@ -125,14 +125,16 @@ public class ProductService {
 	}
 	
 	
-	public void createProduct(ProductDTO dto) {
+	public ProductResponseDTO createProduct(ProductDTO dto) {
 		Product product = mapper.map(dto, Product.class);
 		
 		this.setManufacturer(product);
 		this.createStock(product);
 		this.createSpec(product);
-		
 		productRepository.save(product);
+		
+		return mapper.map(product, ProductResponseDTO.class);
+		
 	}
 	private void setManufacturer(Product product) {
 		Manufacturer mf = mRepository
