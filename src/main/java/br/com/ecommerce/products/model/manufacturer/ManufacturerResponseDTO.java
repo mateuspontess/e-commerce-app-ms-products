@@ -1,16 +1,20 @@
 package br.com.ecommerce.products.model.manufacturer;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ManufacturerResponseDTO{
 	
-	private final Long id;
-	private final String name;
+	private Long id;
+	private String name;
 	
 	
 	public ManufacturerResponseDTO(Manufacturer manufacturer) {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
@@ -94,9 +95,10 @@ public class ProductController {
 	
 	@PostMapping
 	@Transactional
-	public ResponseEntity<?> createProdut(@RequestBody @Valid ProductDTO dto) {
-		service.createProduct(dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody @Valid ProductDTO dto, UriComponentsBuilder uriBuilder) {
+		ProductResponseDTO responseBody = service.createProduct(dto);
+		var uri = uriBuilder.path("/publications/{productId}").buildAndExpand(responseBody.getId()).toUri();
+		return ResponseEntity.created(uri).body(responseBody);
 	}
 	
 	

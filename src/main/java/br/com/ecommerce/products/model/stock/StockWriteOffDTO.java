@@ -1,14 +1,16 @@
 package br.com.ecommerce.products.model.stock;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class StockWriteOffDTO {
 
-	private final Long productId;
-	private final Integer unit;
+	private Long productId;
+	private Integer unit;
 }
