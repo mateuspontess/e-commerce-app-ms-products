@@ -85,27 +85,27 @@ public class ProductService {
 				);
 	}
 	
-	
 	public void updateProduct(Long id, ProductUpdateDTO dto) {
 		Product currentProduct = productRepository.getReferenceById(id);
-		Product update = mapper.map(dto, Product.class);
+		Product updateData = mapper.map(dto, Product.class);
 		
-		if (update.getManufacturer() != null) {
+		if (updateData.getManufacturer() != null) {
 			Manufacturer previousManufacturer = mRepository
 					.getReferenceById(currentProduct.getManufacturer().getId());
-			previousManufacturer.getProducts().remove(currentProduct);	
+			previousManufacturer.removeProduct(currentProduct);	
 			
 			Manufacturer newManufacturer = mRepository
-					.findByName(update.getManufacturer().getName())
+					.findByName(updateData.getManufacturer().getName())
 					.orElseThrow(EntityNotFoundException::new);
 			
-			update.setManufacturer(newManufacturer);
-			newManufacturer.getProducts().add(currentProduct);
-			currentProduct.update(update);
+			updateData.setManufacturer(newManufacturer);
+			newManufacturer.addProduct(currentProduct);
+			
+			currentProduct.update(updateData);
 			mRepository.save(newManufacturer);
 			return;
 		}
-		currentProduct.update(update);
+		currentProduct.update(updateData);
 	}
 	
 	public void subtractUnitsInStock(Long id, StockDTO dto) {

@@ -36,6 +36,6 @@ public class ManufacturerService {
 	
 	public void updateManufacturer(Long id, ManufacturerDTO dto){
 		Manufacturer mf = repository.getReferenceById(id);
-		mf.update(dto.getName());
+		mf.updateName(dto.getName());
 	}
 }
