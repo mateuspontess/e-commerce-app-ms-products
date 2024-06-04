@@ -30,8 +30,8 @@ public class ManufacturerService {
 		return new ManufacturerResponseDTO(mf);
 	}
 	
-	public void saveManufacturer(ManufacturerDTO dto){
-		repository.save(new Manufacturer(dto.getName()));
+	public ManufacturerResponseDTO saveManufacturer(ManufacturerDTO dto){
+		return new ManufacturerResponseDTO(repository.save(new Manufacturer(dto.getName())));
 	}
 	
 	public void updateManufacturer(Long id, ManufacturerDTO dto){

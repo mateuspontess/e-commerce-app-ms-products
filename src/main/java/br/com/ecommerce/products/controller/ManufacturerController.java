@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
@@ -29,9 +30,10 @@ public class ManufacturerController {
 	
 	@PostMapping
 	@Transactional
-	public ResponseEntity<?> create(@RequestBody @Valid ManufacturerDTO dto){
-		service.saveManufacturer(dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<ManufacturerResponseDTO> create(@RequestBody @Valid ManufacturerDTO dto, UriComponentsBuilder uriBuilder){
+		ManufacturerResponseDTO responseBody = service.saveManufacturer(dto);
+		var uri = uriBuilder.path("/manufacturers/{id}").buildAndExpand(responseBody.getId()).toUri();
+		return ResponseEntity.created(uri).body(responseBody);
 	}
 
 	@GetMapping
