@@ -33,7 +33,6 @@ public class ProductSpec {
 		this.value = value;
 	}
 	
-	
 	@Override
 	public String toString() {
 		return "ProductSpec(id=" + this.id + ", " + this.attribute + ", " + this.value + ")";

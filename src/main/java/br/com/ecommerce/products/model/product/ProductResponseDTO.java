@@ -9,9 +9,11 @@ import br.com.ecommerce.products.model.stock.StockResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-@Getter
+@Getter 
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
