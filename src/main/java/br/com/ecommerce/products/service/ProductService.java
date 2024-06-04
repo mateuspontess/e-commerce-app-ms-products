@@ -100,7 +100,7 @@ public class ProductService {
 			
 			updateData.setManufacturer(newManufacturer);
 			newManufacturer.addProduct(currentProduct);
-			
+
 			currentProduct.update(updateData);
 			mRepository.save(newManufacturer);
 			return;
@@ -120,8 +120,8 @@ public class ProductService {
 		
 		productRepository.findAllById(dto.stream()
 				.map(StockWriteOffDTO::getProductId)
-				.toList()
-				).forEach(p -> p.getStock().updateStock(writeOffValueMap.get(p.getId())));
+				.toList())
+					.forEach(p -> p.getStock().updateStock(writeOffValueMap.get(p.getId())));
 	}
 	
 	
@@ -133,8 +133,7 @@ public class ProductService {
 		this.createSpec(product);
 		productRepository.save(product);
 		
-		return mapper.map(product, ProductResponseDTO.class);
-		
+		return new ProductResponseDTO(product);
 	}
 	private void setManufacturer(Product product) {
 		Manufacturer mf = mRepository

@@ -21,6 +21,7 @@ public class StockResponseDTO {
 	public StockResponseDTO(Stock data) {
 		this.id = data.getId();
 		this.productId = data.getProduct().getId();
+		this.name = data.getProduct().getName();
 		this.unit = data.getUnit();
 	}
 }
