@@ -1,19 +1,21 @@
 package br.com.ecommerce.products.model.product;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductSpecDTO {
 	
 	@NotBlank
-	private final String attribute;
+	private String attribute;
 	@NotBlank
-	private final String value;
+	private String value;
 	
 	
 	public ProductSpecDTO(ProductSpec p) {

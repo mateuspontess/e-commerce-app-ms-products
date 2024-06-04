@@ -8,27 +8,29 @@ import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.stock.StockDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDTO {
 	
 	@NotBlank
-    private final String name;
+    private String name;
 	@NotBlank
-	private final String description;
+	private String description;
 	@NotNull
-	private final BigDecimal price;
+	private BigDecimal price;
 	@NotNull
-	private final Category category;
+	private Category category;
 	@NotNull
-    private final StockDTO stock; // cria junto com o objeto Product
+    private StockDTO stock; // cria junto com o objeto Product
     @NotNull
-    private final ManufacturerDTO manufacturer; // espera-se que já esteja criado no banco de dados
+    private ManufacturerDTO manufacturer; // espera-se que já esteja criado no banco de dados
     @NotNull
-    private final List<ProductSpecDTO> specs = new ArrayList<>(); // cria junto com o objeto
+    private List<ProductSpecDTO> specs = new ArrayList<>(); // cria junto com o objeto
 }

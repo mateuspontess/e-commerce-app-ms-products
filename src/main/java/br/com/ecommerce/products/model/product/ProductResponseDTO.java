@@ -6,23 +6,25 @@ import java.util.List;
 
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
 import br.com.ecommerce.products.model.stock.StockResponseDTO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponseDTO {
 	
-	private final Long id;
-    private final String name;
-	private final String description;
-	private final BigDecimal price;
-	private final Category category;
-    private final StockResponseDTO stock; // cria junto com o objeto Product
-    private final ManufacturerResponseDTO manufacturer; // espera-se que já esteja criado no banco de dados
-    private final List<ProductSpecDTO> specs = new ArrayList<>(); // cria junto com o objeto Product
+	private Long id;
+    private String name;
+	private String description;
+	private BigDecimal price;
+	private Category category;
+    private StockResponseDTO stock; // cria junto com o objeto Product
+    private ManufacturerResponseDTO manufacturer; // espera-se que já esteja criado no banco de dados
+    private List<ProductSpecDTO> specs = new ArrayList<>(); // cria junto com o objeto Product
      
     public ProductResponseDTO(Product data) {
     	this.id = data.getId();

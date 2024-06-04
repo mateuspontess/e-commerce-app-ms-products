@@ -3,18 +3,20 @@ package br.com.ecommerce.products.model.product;
 import java.math.BigDecimal;
 
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductUpdateDTO {
 
-	private final String name;
-	private final String description;
-	private final BigDecimal price;
-	private final String category;
-	private final ManufacturerDTO manufacturer;
+	private String name;
+	private String description;
+	private BigDecimal price;
+	private String category;
+	private ManufacturerDTO manufacturer;
 }

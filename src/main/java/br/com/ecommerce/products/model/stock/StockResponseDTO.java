@@ -1,19 +1,21 @@
 package br.com.ecommerce.products.model.stock;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class StockResponseDTO {
 	
-	private final Long id;
-	private final Long productId;
-	private final String name;
-	private final Integer unit;
-	
+	private Long id;
+	private Long productId;
+	private String name;
+	private Integer unit;
+
 	public StockResponseDTO(Stock data) {
 		this.id = data.getId();
 		this.productId = data.getProduct().getId();

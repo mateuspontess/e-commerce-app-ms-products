@@ -1,17 +1,19 @@
 package br.com.ecommerce.products.model.product;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductIdAndUnitsDTO {
 	
 	@NotNull
-	private final Long id;
+	private Long id;
 	@NotNull
-	private final Integer unit;
+	private Integer unit;
 }
