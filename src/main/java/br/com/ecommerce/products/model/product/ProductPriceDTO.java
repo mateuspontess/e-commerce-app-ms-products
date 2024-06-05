@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductAndPriceDTO {
+public class ProductPriceDTO {
 
 	private Long id;
 	private BigDecimal price;
