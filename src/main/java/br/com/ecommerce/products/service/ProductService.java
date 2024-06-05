@@ -25,7 +25,9 @@ import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Service
 public class ProductService {
 
@@ -69,17 +71,16 @@ public class ProductService {
 		Map<Long, Integer> unitiesRequested = productsRequest.stream()
 				.collect(Collectors.toMap(p -> p.getId(), p -> p.getUnit()));
 		
-		return this.getAllProductsByListOfIds(productsRequest).stream()
-					.filter(p -> p != null && p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
-					.collect(Collectors.toList());
+		return this.getAllProductsByListOfIds(productsRequest.stream()
+			.map(ProductIdAndUnitsDTO::getId)
+			.toList())
+			.stream()
+				.filter(p -> p != null && p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
+				.collect(Collectors.toList());
 	}
 	
-	public List<Product> getAllProductsByListOfIds(List<ProductIdAndUnitsDTO> productsRequest) {
-		return productRepository.findAllById(
-				productsRequest.stream()
-					.map(ProductIdAndUnitsDTO::getId)
-					.toList()
-				);
+	public List<Product> getAllProductsByListOfIds(List<Long> productsIds) {
+		return productRepository.findAllById(productsIds);
 	}
 	
 	public void updateProduct(Long id, ProductUpdateDTO dto) {
@@ -125,6 +126,7 @@ public class ProductService {
 	
 	public ProductResponseDTO createProduct(ProductDTO dto) {
 		Product product = mapper.map(dto, Product.class);
+		System.out.println("VALOR DO PRODUCT ASSIM QUE É CONVERTIDO:" + product);
 		
 		this.setManufacturer(product);
 		this.createSpec(product);
