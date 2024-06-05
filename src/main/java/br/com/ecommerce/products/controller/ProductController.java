@@ -22,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
-import br.com.ecommerce.products.model.product.ProductAndPriceDTO;
+import br.com.ecommerce.products.model.product.ProductPriceDTO;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
@@ -62,17 +62,15 @@ public class ProductController {
 	
 	
 	@PostMapping("/specs")
-	public ResponseEntity<?> readAllBySpecs(
+	public ResponseEntity<Page<ProductResponseDTO>> readAllBySpecs(
 			@PageableDefault(size = 10) Pageable pageable,
 			@RequestBody List<Map<String, String>> map
 			) {
-		
-		Page<ProductResponseDTO> dtos = service.getAllBySpecs(pageable, map);
-		return ResponseEntity.ok(dtos);
+		return ResponseEntity.ok(service.getAllBySpecs(pageable, map));
 	}
 
 	@PostMapping("/stocks")
-	public ResponseEntity<?> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
+	public ResponseEntity<List<StockResponseDTO>> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
 		List<Product> outOfStock = service.verifyStocks(dto);
 		
 		List<StockResponseDTO> responseBody = null;
@@ -87,9 +85,9 @@ public class ProductController {
 	}
 	
 	@PostMapping("/prices")
-	public ResponseEntity<List<ProductAndPriceDTO>> getPrices(@RequestBody @Valid List<ProductIdAndUnitsDTO> productsIds){
+	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid List<ProductIdAndUnitsDTO> productsIds){
 		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
-				.map(p -> new ProductAndPriceDTO(p.getId(), p.getPrice()))
+				.map(p -> new ProductPriceDTO(p.getId(), p.getPrice()))
 				.toList());
 	}
 	
