@@ -16,7 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,9 +60,16 @@ public class Product {
 		this.checkNotBlank(description, "description");
 		this.checkPrice(price);
 		this.checkNotNull(category, "category");
-		this.checkNotNull(stock, "stock");
 		this.checkNotNull(manufacturer, "manufacturer");
 		this.checkNotNull(specs, "specs");
+		
+		this.name = name;
+		this.description = description;
+		this.price = price;
+		this.category = category;
+		this.definesStock(stock);
+		this.manufacturer = manufacturer;
+		this.specs.addAll(specs);
 	}
 	
 	public void update(Product data) {
@@ -102,5 +108,13 @@ public class Product {
 		if (price.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new IllegalArgumentException("Price must be a positive value");
 		}
+	}
+
+	private void definesStock(Stock stock) {
+		if (stock == null) {
+			this.stock = new Stock(0);
+			return;
+		}
+		this.stock = stock;
 	}
 }
