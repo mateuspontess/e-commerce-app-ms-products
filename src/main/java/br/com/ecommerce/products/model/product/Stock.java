@@ -24,7 +24,7 @@ public class Stock {
 	}
 	
 	public void update(int value) {
-		if ((this.unit - value) < 0) {
+		if ((this.unit + value) < 0) {
 			this.unit = 0;
 			return;
 		}
