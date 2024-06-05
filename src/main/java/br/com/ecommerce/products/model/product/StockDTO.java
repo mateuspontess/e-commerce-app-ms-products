@@ -1,4 +1,4 @@
-package br.com.ecommerce.products.model.stock;
+package br.com.ecommerce.products.model.product;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

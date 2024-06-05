@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
-import br.com.ecommerce.products.model.stock.StockDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

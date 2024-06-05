@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import br.com.ecommerce.products.model.stock.StockWriteOffDTO;
+import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.service.ProductService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

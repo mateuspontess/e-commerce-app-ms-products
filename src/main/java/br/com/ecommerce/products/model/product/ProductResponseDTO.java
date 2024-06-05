@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
-import br.com.ecommerce.products.model.stock.StockResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,19 +23,19 @@ public class ProductResponseDTO {
 	private String description;
 	private BigDecimal price;
 	private Category category;
-    private StockResponseDTO stock; // cria junto com o objeto Product
+    private Stock stock; // cria junto com o objeto Product
     private ManufacturerResponseDTO manufacturer; // espera-se que já esteja criado no banco de dados
     private List<ProductSpecDTO> specs = new ArrayList<>(); // cria junto com o objeto Product
      
-    public ProductResponseDTO(Product data) {
-    	this.id = data.getId();
-    	this.name = data.getName();
-    	this.description = data.getDescription();
-    	this.price = data.getPrice();
-    	this.stock = new StockResponseDTO(data.getStock());
-    	this.category = data.getCategory();
-    	this.manufacturer = new ManufacturerResponseDTO(data.getManufacturer());
-    	this.specs.addAll(data.getSpecs().stream()
+    public ProductResponseDTO(Product product) {
+    	this.id = product.getId();
+    	this.name = product.getName();
+    	this.description = product.getDescription();
+    	this.price = product.getPrice();
+    	this.stock = product.getStock();
+    	this.category = product.getCategory();
+    	this.manufacturer = new ManufacturerResponseDTO(product.getManufacturer());
+    	this.specs.addAll(product.getSpecs().stream()
     			.map(s -> new ProductSpecDTO(s)).toList());
     }
 }

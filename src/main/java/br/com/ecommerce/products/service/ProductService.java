@@ -19,12 +19,11 @@ import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
-import br.com.ecommerce.products.model.stock.Stock;
-import br.com.ecommerce.products.model.stock.StockDTO;
-import br.com.ecommerce.products.model.stock.StockWriteOffDTO;
+import br.com.ecommerce.products.model.product.Stock;
+import br.com.ecommerce.products.model.product.StockDTO;
+import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
-import br.com.ecommerce.products.repository.StockRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -32,8 +31,6 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository productRepository;
-	@Autowired
-	private StockRepository stockRepository;
 	@Autowired
 	private ManufacturerRepository mRepository;
 	@Autowired
@@ -108,11 +105,11 @@ public class ProductService {
 		currentProduct.update(updateData);
 	}
 	
-	public void subtractUnitsInStock(Long id, StockDTO dto) {
-		Product original = productRepository.getReferenceById(id);
+	public void updateStockByProductId(Long productId, StockDTO dto) {
+		Product original = productRepository.getReferenceById(productId);
 		Stock stockUpdate = mapper.map(dto, Stock.class);
 		
-		original.getStock().updateStock(stockUpdate.getUnit());
+		original.updateStock(stockUpdate.getUnit());
 	}
 	public void updateStocks(List<StockWriteOffDTO> dto) {
 		Map<Long, Integer> writeOffValueMap = dto.stream()
@@ -120,8 +117,9 @@ public class ProductService {
 		
 		productRepository.findAllById(dto.stream()
 				.map(StockWriteOffDTO::getProductId)
-				.toList())
-					.forEach(p -> p.getStock().updateStock(writeOffValueMap.get(p.getId())));
+				.toList()
+				)
+				.forEach(p -> p.updateStock(writeOffValueMap.get(p.getId())));
 	}
 	
 	
@@ -129,7 +127,6 @@ public class ProductService {
 		Product product = mapper.map(dto, Product.class);
 		
 		this.setManufacturer(product);
-		this.createStock(product);
 		this.createSpec(product);
 		productRepository.save(product);
 		
@@ -141,12 +138,6 @@ public class ProductService {
 				.orElseThrow(EntityNotFoundException::new);
 		
 		product.setManufacturer(mf);
-	}
-	private void createStock(Product product) {
-		Stock stock = product.getStock();
-		stock.setProduct(product);
-		
-		stockRepository.save(stock);
 	}
 	private void createSpec(Product product) {
 		List<ProductSpec> specs = product.getSpecs();

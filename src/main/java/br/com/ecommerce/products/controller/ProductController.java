@@ -22,13 +22,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
-import br.com.ecommerce.products.model.product.ProductPriceDTO;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
+import br.com.ecommerce.products.model.product.ProductPriceDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
-import br.com.ecommerce.products.model.stock.StockDTO;
-import br.com.ecommerce.products.model.stock.StockResponseDTO;
+import br.com.ecommerce.products.model.product.Stock;
+import br.com.ecommerce.products.model.product.StockDTO;
 import br.com.ecommerce.products.service.ProductService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -61,6 +61,29 @@ public class ProductController {
 	}
 	
 	
+	@PostMapping
+	@Transactional
+	public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody @Valid ProductDTO dto, UriComponentsBuilder uriBuilder) {
+		ProductResponseDTO responseBody = service.createProduct(dto);
+		var uri = uriBuilder.path("/publications/{productId}").buildAndExpand(responseBody.getId()).toUri();
+		return ResponseEntity.created(uri).body(responseBody);
+	}
+	
+	@PostMapping("/stocks")
+	public ResponseEntity<List<Stock>> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
+		List<Product> outOfStock = service.verifyStocks(dto);
+		
+		List<Stock> responseBody = null;
+		if(outOfStock.isEmpty()) {
+			return ResponseEntity.ok(responseBody);
+		}
+		responseBody = outOfStock.stream()
+				.map(p -> new Stock(p.getStock()))
+				.toList();
+		
+		return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(responseBody);
+	}
+
 	@PostMapping("/specs")
 	public ResponseEntity<Page<ProductResponseDTO>> readAllBySpecs(
 			@PageableDefault(size = 10) Pageable pageable,
@@ -68,35 +91,12 @@ public class ProductController {
 			) {
 		return ResponseEntity.ok(service.getAllBySpecs(pageable, map));
 	}
-
-	@PostMapping("/stocks")
-	public ResponseEntity<List<StockResponseDTO>> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
-		List<Product> outOfStock = service.verifyStocks(dto);
-		
-		List<StockResponseDTO> responseBody = null;
-		if(outOfStock.isEmpty()) {
-			return ResponseEntity.ok(responseBody);
-		}
-		responseBody = outOfStock.stream()
-				.map(p -> new StockResponseDTO(p.getStock()))
-				.toList();
-		
-		return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(responseBody);
-	}
 	
 	@PostMapping("/prices")
 	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid List<ProductIdAndUnitsDTO> productsIds){
 		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
 				.map(p -> new ProductPriceDTO(p.getId(), p.getPrice()))
 				.toList());
-	}
-	
-	@PostMapping
-	@Transactional
-	public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody @Valid ProductDTO dto, UriComponentsBuilder uriBuilder) {
-		ProductResponseDTO responseBody = service.createProduct(dto);
-		var uri = uriBuilder.path("/publications/{productId}").buildAndExpand(responseBody.getId()).toUri();
-		return ResponseEntity.created(uri).body(responseBody);
 	}
 	
 	
@@ -110,7 +110,7 @@ public class ProductController {
 	@PutMapping("/{productId}/stocks")
 	@Transactional
 	public ResponseEntity<?> updateStock(@PathVariable Long productId, @RequestBody @Valid StockDTO dto) {
-		service.subtractUnitsInStock(productId, dto);
+		service.updateStockByProductId(productId, dto);
 		return ResponseEntity.ok().build();
 	}
 }
