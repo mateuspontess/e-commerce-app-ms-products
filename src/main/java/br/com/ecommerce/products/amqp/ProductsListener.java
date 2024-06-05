@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import br.com.ecommerce.products.model.stock.StockWriteOffDTO;
 import br.com.ecommerce.products.service.ProductService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @Component
 public class ProductsListener {
@@ -20,7 +21,7 @@ public class ProductsListener {
 	
 	@RabbitListener(queues = "products.stock-orders")
 	@Transactional
-	public void receibeQueueMessageOrder(@Payload List<StockWriteOffDTO> dto) {
+	public void receibeQueueMessageOrder(@Payload @Valid List<StockWriteOffDTO> dto) {
 		service.updateStocks(dto);
 	}
 }
