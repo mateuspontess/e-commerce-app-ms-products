@@ -27,11 +27,12 @@ import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductPriceDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
-import br.com.ecommerce.products.model.product.Stock;
 import br.com.ecommerce.products.model.product.StockDTO;
+import br.com.ecommerce.products.model.product.StockResponseDTO;
 import br.com.ecommerce.products.service.ProductService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/products")
@@ -70,16 +71,17 @@ public class ProductController {
 	}
 	
 	@PostMapping("/stocks")
-	public ResponseEntity<List<Stock>> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
+	public ResponseEntity<List<StockResponseDTO>> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
 		List<Product> outOfStock = service.verifyStocks(dto);
 		
-		List<Stock> responseBody = null;
+		List<StockResponseDTO> responseBody = null;
 		if(outOfStock.isEmpty()) {
 			return ResponseEntity.ok(responseBody);
 		}
+		
 		responseBody = outOfStock.stream()
-				.map(p -> new Stock(p.getStock()))
-				.toList();
+			.map(StockResponseDTO::new)
+			.toList();
 		
 		return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(responseBody);
 	}
@@ -93,7 +95,7 @@ public class ProductController {
 	}
 	
 	@PostMapping("/prices")
-	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid List<ProductIdAndUnitsDTO> productsIds){
+	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid @NotNull List<Long> productsIds){
 		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
 				.map(p -> new ProductPriceDTO(p.getId(), p.getPrice()))
 				.toList());
