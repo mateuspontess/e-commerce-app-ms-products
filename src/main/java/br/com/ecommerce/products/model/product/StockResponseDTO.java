@@ -6,21 +6,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-// @Getter 
-// @Setter
-// @ToString
-// @NoArgsConstructor
-// @AllArgsConstructor
-// public class StockResponseDTO {
+@Getter 
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class StockResponseDTO {
 	
-// 	private Long productId;
-// 	private String name;
-// 	private Integer unit;
+	private Long productId;
+	private String name;
+	private Integer unit;
 
-// 	public StockResponseDTO(Stock data) {
-// 		this.id = data.getId();
-// 		this.productId = data.getProduct().getId();
-// 		this.name = data.getProduct().getName();
-// 		this.unit = data.getUnit();
-// 	}
-// }
+	public StockResponseDTO(Product product) {
+		this.productId = product.getId();
+		this.name = product.getName();
+		this.unit = product.getStock().getUnit();
+	}
+}
