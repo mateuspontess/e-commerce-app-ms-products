@@ -126,7 +126,6 @@ public class ProductService {
 	
 	public ProductResponseDTO createProduct(ProductDTO dto) {
 		Product product = mapper.map(dto, Product.class);
-		System.out.println("VALOR DO PRODUCT ASSIM QUE É CONVERTIDO:" + product);
 		
 		this.setManufacturer(product);
 		this.createSpec(product);
