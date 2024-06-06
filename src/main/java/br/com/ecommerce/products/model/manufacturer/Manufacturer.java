@@ -33,20 +33,25 @@ public class Manufacturer {
 	
 	
 	public Manufacturer(String name) {
+		this.checkName(name);
 		this.name = name.toUpperCase();
 	}
 	
 	public void updateName(String name) {
-		if (name != null && !name.isBlank())
-			this.name = name.toUpperCase();
+		checkName(name);
+		this.name = name.toUpperCase();
 	}
 
 	public void addProduct(Product product) {
 		this.products.add(product);
 	}
-
 	public void removeProduct(Product product) {
 		this.products.remove(product);
+	}
+
+	private void checkName(String name) {
+		if (name == null || name.isBlank())
+			throw new IllegalArgumentException("Cannot be blank: name");
 	}
 	
 	@Override
