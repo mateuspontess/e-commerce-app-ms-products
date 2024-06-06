@@ -1,4 +1,4 @@
-package br.com.ecommerce.unit;
+package br.com.ecommerce.products.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
