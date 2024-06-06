@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,6 +61,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting product details by ID")
     void getProductTest01() {
         // arrange
         Product product = Product.builder()
@@ -88,11 +90,13 @@ class ProductServiceTest {
 		assertNull(result.getSpecs());
 	}
     @Test
+    @DisplayName("Test getting product details by non-existent ID")
     void getProductTest02() {
         assertThrows(EntityNotFoundException.class, () -> service.getProduct(10L));
 	}
 
     @Test
+    @DisplayName("Test getting all products with parameters")
     void getAllProductWithParamsTest01() {
         // arrange
         Product product = Product.builder()
@@ -126,6 +130,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting all products by specifications")
     void getAllBySpecsTest01() {
         // arrange
         Product product = Product.builder()
@@ -159,6 +164,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Test verifying stocks of products")
     void verifyStocksTest01() {
         // arrange
         List<Product> products = List.of(
@@ -181,6 +187,7 @@ class ProductServiceTest {
         assertEquals(result.get(0).getId(), products.get(1).getId());
     }
     @Test
+    @DisplayName("Test getting all products by list of IDs")
     void getAllProductsByListOfIds01() {
         // arrange
         List<Product> products = List.of(
@@ -198,6 +205,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Test updating product with full data")
     void updateProductTest01() {
         // arrange
         Manufacturer oldManufacturer = new Manufacturer("AMD");
@@ -227,6 +235,7 @@ class ProductServiceTest {
         assertEquals(requestBody.getManufacturer().getName(), product.getManufacturer().getName());
     }
     @Test
+    @DisplayName("Test updating product with partial data")
     void updateProductTest02() {
         // arrange
         Product product = Product.builder()
@@ -252,6 +261,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Test updating product stock by product ID")
     void updateStockByProductIdTest01() {
         // arrange
         Product product = Product.builder()
@@ -279,6 +289,7 @@ class ProductServiceTest {
         );
     }
     @Test
+    @DisplayName("Test updating stocks of multiple products")
     void updateStocksTes01() {
         // arrange
         List<Product> products = List.of(
@@ -306,6 +317,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Test creating product with valid data")
     void createProductTest01() {
         // arrange
         ProductDTO requestBody = new ProductDTO(

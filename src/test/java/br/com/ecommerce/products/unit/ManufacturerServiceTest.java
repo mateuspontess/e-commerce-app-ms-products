@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +33,7 @@ class ManufacturerServiceTest {
     private ManufacturerService service;
 
     @Test
+    @DisplayName("Test retrieving all manufacturers")
     void getAllTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
@@ -48,6 +50,7 @@ class ManufacturerServiceTest {
 	}
 
     @Test
+    @DisplayName("Test retrieving manufacturer by ID")
     void getByIdTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
@@ -62,6 +65,7 @@ class ManufacturerServiceTest {
 	}
 
     @Test
+    @DisplayName("Test saving manufacturer")
     void saveManufacturerTest01() {
         // arrange
         ManufacturerDTO requestBody = new ManufacturerDTO("AMD");
@@ -75,6 +79,7 @@ class ManufacturerServiceTest {
 	}
 
     @Test
+    @DisplayName("Test updating manufacturer")
     void updateManufacturerTest01() {
         // arrange
         Manufacturer target = new Manufacturer("AMD");
