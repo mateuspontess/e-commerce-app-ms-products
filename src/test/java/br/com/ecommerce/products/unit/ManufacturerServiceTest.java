@@ -37,7 +37,7 @@ class ManufacturerServiceTest {
     void getAllTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
-        when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl(List.of(manufacturer)));
+        when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(manufacturer)));
         
         // act
         ManufacturerResponseDTO result = service.getAll(PageRequest.of(0, 10))
