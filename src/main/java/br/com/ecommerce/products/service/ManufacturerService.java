@@ -34,8 +34,9 @@ public class ManufacturerService {
 		return new ManufacturerResponseDTO(repository.save(new Manufacturer(dto.getName())));
 	}
 	
-	public void updateManufacturer(Long id, ManufacturerDTO dto){
+	public ManufacturerResponseDTO updateManufacturer(Long id, ManufacturerDTO dto){
 		Manufacturer mf = repository.getReferenceById(id);
 		mf.updateName(dto.getName());
+		return new ManufacturerResponseDTO(mf);
 	}
 }

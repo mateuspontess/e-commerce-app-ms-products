@@ -48,8 +48,7 @@ public class ManufacturerController {
 	
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ManufacturerDTO dto){
-		service.updateManufacturer(id, dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<ManufacturerResponseDTO> update(@PathVariable Long id, @RequestBody @Valid ManufacturerDTO dto){
+		return ResponseEntity.ok().body(service.updateManufacturer(id, dto));
 	}
 }
