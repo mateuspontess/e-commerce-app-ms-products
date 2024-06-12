@@ -43,6 +43,7 @@ public class ProductService {
 		Product product = productRepository
 				.findById(id)
 				.orElseThrow(EntityNotFoundException::new);
+		product.getSpecs();
 
 		return mapper.map(product, ProductResponseDTO.class);
 	}
@@ -64,7 +65,6 @@ public class ProductService {
 		return productRepository
 				.findProductsBySpecs(pageable, map)
 				.map(ProductResponseDTO::new);
-		
 	}
 	
 	public List<Product> verifyStocks(List<ProductIdAndUnitsDTO> productsRequest) {
@@ -73,7 +73,8 @@ public class ProductService {
 		
 		return this.getAllProductsByListOfIds(productsRequest.stream()
 			.map(ProductIdAndUnitsDTO::getId)
-			.toList())
+			.toList()
+			)
 			.stream()
 				.filter(p -> p != null && p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
 				.collect(Collectors.toList());
@@ -83,27 +84,28 @@ public class ProductService {
 		return productRepository.findAllById(productsIds);
 	}
 	
-	public void updateProduct(Long id, ProductUpdateDTO dto) {
+	public Product updateProduct(Long id, ProductUpdateDTO dto) {
 		Product currentProduct = productRepository.getReferenceById(id);
 		Product updateData = mapper.map(dto, Product.class);
 		
 		if (updateData.getManufacturer() != null) {
-			Manufacturer previousManufacturer = mRepository
-					.getReferenceById(currentProduct.getManufacturer().getId());
-			previousManufacturer.removeProduct(currentProduct);	
+			Manufacturer currentManufacturer = mRepository
+				.findById(currentProduct.getManufacturer().getId())
+				.orElseThrow(EntityNotFoundException::new);
+			currentManufacturer.removeProduct(currentProduct);
 			
 			Manufacturer newManufacturer = mRepository
 					.findByName(updateData.getManufacturer().getName())
-					.orElseThrow(EntityNotFoundException::new);
-			
+					.orElseThrow(() -> new EntityNotFoundException("Manufacturer not found. Create a Manufacturer to link it to a product"));
 			updateData.setManufacturer(newManufacturer);
 			newManufacturer.addProduct(currentProduct);
 
 			currentProduct.update(updateData);
 			mRepository.save(newManufacturer);
-			return;
+			return currentProduct;
 		}
 		currentProduct.update(updateData);
+		return currentProduct;
 	}
 	
 	public void updateStockByProductId(Long productId, StockDTO dto) {
