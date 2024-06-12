@@ -25,7 +25,7 @@ import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.service.ManufacturerService;
 
 @ExtendWith(MockitoExtension.class)
-class ManufacturerServiceTest {
+class ManufacturerServiceUnitTest {
 
     @Mock
     private ManufacturerRepository repository;
@@ -84,7 +84,7 @@ class ManufacturerServiceTest {
         // arrange
         Manufacturer target = new Manufacturer("AMD");
         ManufacturerDTO requestBody = new ManufacturerDTO("INTEL");
-        when(repository.getReferenceById(any())).thenReturn(target);
+        when(repository.findById(any())).thenReturn(Optional.of(target));
         
         // act
         service.updateManufacturer(1L, requestBody);
