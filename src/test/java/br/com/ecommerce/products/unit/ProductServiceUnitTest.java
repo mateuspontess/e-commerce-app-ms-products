@@ -45,7 +45,7 @@ import br.com.ecommerce.products.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest {
+class ProductServiceUnitTest {
 
     @Mock
     private ProductRepository repository;
