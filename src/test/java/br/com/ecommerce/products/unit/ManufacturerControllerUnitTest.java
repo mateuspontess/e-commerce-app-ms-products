@@ -33,7 +33,7 @@ import br.com.ecommerce.products.service.ManufacturerService;
 
 @WebMvcTest(ManufacturerController.class)
 @AutoConfigureJsonTesters
-class ManufacturerControllerTest {
+class ManufacturerControllerUnitTest {
 
     @Autowired
     private MockMvc mvc;
