@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.model.product;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @NoArgsConstructor
 @Getter @Setter
 @Entity(name = "ProductSpec")
@@ -20,8 +22,9 @@ public class ProductSpec {
 	
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
 	private String attribute;
+
+	@Column(name = "\"value\"")
 	private String value;
 	
 	@ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "product_id")
