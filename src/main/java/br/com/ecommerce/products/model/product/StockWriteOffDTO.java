@@ -1,7 +1,6 @@
 package br.com.ecommerce.products.model.product;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -9,11 +8,15 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
 public class StockWriteOffDTO {
 
 	@NotNull
 	private Long productId;
 	@NotNull
 	private Integer unit;
+
+	public StockWriteOffDTO(Long productId, Integer unit) {
+		this.productId = productId;
+		this.unit = -unit;
+	} 
 }
