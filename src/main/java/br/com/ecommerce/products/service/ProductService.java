@@ -21,6 +21,7 @@ import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
 import br.com.ecommerce.products.model.product.Stock;
 import br.com.ecommerce.products.model.product.StockDTO;
+import br.com.ecommerce.products.model.product.StockResponseDTO;
 import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
@@ -108,11 +109,12 @@ public class ProductService {
 		return currentProduct;
 	}
 	
-	public void updateStockByProductId(Long productId, StockDTO dto) {
+	public StockResponseDTO updateStockByProductId(Long productId, StockDTO dto) {
 		Product original = productRepository.getReferenceById(productId);
 		Stock stockUpdate = mapper.map(dto, Stock.class);
 		
 		original.updateStock(stockUpdate.getUnit());
+		return new StockResponseDTO(original.getId(), original.getName(), original.getStock().getUnit());
 	}
 	public void updateStocks(List<StockWriteOffDTO> dto) {
 		Map<Long, Integer> writeOffValueMap = dto.stream()

@@ -111,8 +111,7 @@ public class ProductController {
 	
 	@PutMapping("/{productId}/stocks")
 	@Transactional
-	public ResponseEntity<?> updateStock(@PathVariable Long productId, @RequestBody @Valid StockDTO dto) {
-		service.updateStockByProductId(productId, dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<StockResponseDTO> updateStock(@PathVariable Long productId, @RequestBody @Valid StockDTO dto) {
+		return ResponseEntity.ok().body(service.updateStockByProductId(productId, dto));
 	}
 }
