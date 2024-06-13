@@ -35,7 +35,7 @@ public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
 	@Autowired
-	private ManufacturerRepository mRepository;
+	private ManufacturerRepository manufacturerRepository;
 	@Autowired
 	private ModelMapper mapper;
 
@@ -90,19 +90,19 @@ public class ProductService {
 		Product updateData = mapper.map(dto, Product.class);
 		
 		if (updateData.getManufacturer() != null) {
-			Manufacturer currentManufacturer = mRepository
+			Manufacturer currentManufacturer = manufacturerRepository
 				.findById(currentProduct.getManufacturer().getId())
 				.orElseThrow(EntityNotFoundException::new);
 			currentManufacturer.removeProduct(currentProduct);
 			
-			Manufacturer newManufacturer = mRepository
+			Manufacturer newManufacturer = manufacturerRepository
 					.findByName(updateData.getManufacturer().getName())
 					.orElseThrow(() -> new EntityNotFoundException("Manufacturer not found. Create a Manufacturer to link it to a product"));
 			updateData.setManufacturer(newManufacturer);
 			newManufacturer.addProduct(currentProduct);
 
 			currentProduct.update(updateData);
-			mRepository.save(newManufacturer);
+			manufacturerRepository.save(newManufacturer);
 			return currentProduct;
 		}
 		currentProduct.update(updateData);
@@ -110,11 +110,11 @@ public class ProductService {
 	}
 	
 	public StockResponseDTO updateStockByProductId(Long productId, StockDTO dto) {
-		Product original = productRepository.getReferenceById(productId);
+		Product target = productRepository.getReferenceById(productId);
 		Stock stockUpdate = mapper.map(dto, Stock.class);
 		
-		original.updateStock(stockUpdate.getUnit());
-		return new StockResponseDTO(original.getId(), original.getName(), original.getStock().getUnit());
+		target.updateStock(stockUpdate.getUnit());
+		return new StockResponseDTO(target.getId(), target.getName(), target.getStock().getUnit());
 	}
 	public void updateStocks(List<StockWriteOffDTO> dto) {
 		Map<Long, Integer> writeOffValueMap = dto.stream()
@@ -138,7 +138,7 @@ public class ProductService {
 		return new ProductResponseDTO(product);
 	}
 	private void setManufacturer(Product product) {
-		Manufacturer mf = mRepository
+		Manufacturer mf = manufacturerRepository
 				.findByName(product.getManufacturer().getName().toUpperCase())
 				.orElseThrow(EntityNotFoundException::new);
 		
