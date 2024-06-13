@@ -221,7 +221,6 @@ class ProductServiceUnitTest {
             new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN.toString(), new ManufacturerDTO("INTEL"));
 
         when(repository.getReferenceById(any())).thenReturn(product);
-        when(manufacturerRepository.getReferenceById(any())).thenReturn(oldManufacturer);
         when(manufacturerRepository.findByName(any())).thenReturn(Optional.of(new Manufacturer(requestBody.getManufacturer().getName())));
         
         // act
@@ -298,9 +297,9 @@ class ProductServiceUnitTest {
             Product.builder().id(3L).stock(new Stock(300)).build()
         );
         List<StockWriteOffDTO> stockWriteOff = List.of(
-            new StockWriteOffDTO(1L, -100),
-            new StockWriteOffDTO(2L, -200),
-            new StockWriteOffDTO(3L, -300)
+            new StockWriteOffDTO(1L, 100),
+            new StockWriteOffDTO(2L, 200),
+            new StockWriteOffDTO(3L, 300)
         );
 
         when(repository.findAllById(anyList())).thenReturn(products);

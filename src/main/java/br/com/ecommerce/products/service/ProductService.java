@@ -88,10 +88,11 @@ public class ProductService {
 	public Product updateProduct(Long id, ProductUpdateDTO dto) {
 		Product currentProduct = productRepository.getReferenceById(id);
 		Product updateData = mapper.map(dto, Product.class);
+		System.out.println("VALOR DO UPDATE DATA: " + updateData);
 		
 		if (updateData.getManufacturer() != null) {
 			Manufacturer currentManufacturer = manufacturerRepository
-				.findById(currentProduct.getManufacturer().getId())
+				.findByName(currentProduct.getManufacturer().getName())
 				.orElseThrow(EntityNotFoundException::new);
 			currentManufacturer.removeProduct(currentProduct);
 			
