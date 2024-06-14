@@ -19,6 +19,7 @@ import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
+import br.com.ecommerce.products.model.product.ProductUpdateResponseDTO;
 import br.com.ecommerce.products.model.product.Stock;
 import br.com.ecommerce.products.model.product.StockDTO;
 import br.com.ecommerce.products.model.product.StockResponseDTO;
@@ -85,10 +86,9 @@ public class ProductService {
 		return productRepository.findAllById(productsIds);
 	}
 	
-	public Product updateProduct(Long id, ProductUpdateDTO dto) {
+	public ProductUpdateResponseDTO updateProduct(Long id, ProductUpdateDTO dto) {
 		Product currentProduct = productRepository.getReferenceById(id);
 		Product updateData = mapper.map(dto, Product.class);
-		System.out.println("VALOR DO UPDATE DATA: " + updateData);
 		
 		if (updateData.getManufacturer() != null) {
 			Manufacturer currentManufacturer = manufacturerRepository
@@ -104,10 +104,10 @@ public class ProductService {
 
 			currentProduct.update(updateData);
 			manufacturerRepository.save(newManufacturer);
-			return currentProduct;
+			return new ProductUpdateResponseDTO(currentProduct);
 		}
 		currentProduct.update(updateData);
-		return currentProduct;
+		return new ProductUpdateResponseDTO(currentProduct);
 	}
 	
 	public StockResponseDTO updateStockByProductId(Long productId, StockDTO dto) {
