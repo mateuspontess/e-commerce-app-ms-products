@@ -218,7 +218,7 @@ class ProductServiceUnitTest {
                 .build();
 
         ProductUpdateDTO requestBody = 
-            new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN.toString(), new ManufacturerDTO("INTEL"));
+            new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN, new ManufacturerDTO("INTEL"));
 
         when(repository.getReferenceById(any())).thenReturn(product);
         when(manufacturerRepository.findByName(any())).thenReturn(Optional.of(new Manufacturer(requestBody.getManufacturer().getName())));
@@ -230,7 +230,7 @@ class ProductServiceUnitTest {
         assertEquals(requestBody.getName(), product.getName());
         assertEquals(requestBody.getDescription(), product.getDescription());
         assertEquals(requestBody.getPrice(), product.getPrice());
-        assertEquals(requestBody.getCategory().toUpperCase(), product.getCategory().toString().toUpperCase());
+        assertEquals(requestBody.getCategory(), product.getCategory());
         assertEquals(requestBody.getManufacturer().getName(), product.getManufacturer().getName());
     }
     @Test
@@ -242,10 +242,11 @@ class ProductServiceUnitTest {
                 .description("Description-san")
                 .price(BigDecimal.TEN)
                 .category(Category.CPU)
+                .manufacturer(new Manufacturer("AMD"))
                 .build();
 
         ProductUpdateDTO requestBody = 
-            new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN.toString(), null);
+            new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN, null);
 
         when(repository.getReferenceById(any())).thenReturn(product);
         
@@ -256,7 +257,7 @@ class ProductServiceUnitTest {
         assertEquals(requestBody.getName(), product.getName());
         assertEquals(requestBody.getDescription(), product.getDescription());
         assertEquals(requestBody.getPrice(), product.getPrice());
-        assertEquals(requestBody.getCategory().toUpperCase(), product.getCategory().toString().toUpperCase());
+        assertEquals(requestBody.getCategory(), product.getCategory());
     }
 
     @Test
