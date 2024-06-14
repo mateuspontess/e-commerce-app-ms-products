@@ -5,25 +5,22 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-import br.com.ecommerce.products.configs.MySQLTestContainerConfig;
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.product.Category;
@@ -40,15 +37,13 @@ import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
 import br.com.ecommerce.products.service.ProductService;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-@Import(MySQLTestContainerConfig.class)
+@AutoConfigureTestDatabase
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 class ProductServiceIntegrationTest {
 
@@ -59,18 +54,34 @@ class ProductServiceIntegrationTest {
     @Autowired
     private ManufacturerRepository manufacturerRepository;
 
-    @Autowired
-    private EntityManager entityManager;
     private List<Product> productsPersisted;
+    private List<Manufacturer> manufacturersPersisted;
 
     @BeforeEach
-    void setup() throws UnsupportedOperationException, IOException, InterruptedException {
-        this.seedDatabase();
+    void setup() {
+        manufacturersPersisted = manufacturerRepository.saveAll(
+            List.of(new Manufacturer("AMD"), new Manufacturer("INTEL"))
+        );
+
+        Product p1 = createProduct(manufacturersPersisted.get(0), "aaa", "ddd", BigDecimal.valueOf(1000), Category.CPU, 1000, "cores", "12");
+        Product p2 = createProduct(manufacturersPersisted.get(0), "bbb", "ddd", BigDecimal.valueOf(100), Category.CPU, 100, "cores", "8");
+        Product p3 = createProduct(manufacturersPersisted.get(1), "ccc", "ddd", BigDecimal.TEN, Category.GPU, 10, "memory size", "8GB");
+        this.productsPersisted = repository.saveAll(List.of(p1, p2, p3));
     }
-    @AfterEach
-    void teardown() throws UnsupportedOperationException, IOException, InterruptedException {
-        productsPersisted = null;
-        this.truncateAllTables();
+
+    Product createProduct(Manufacturer manufacturer, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
+        ProductSpec spec = new ProductSpec(specAttribute, specValue);
+        Product product = Product.builder()
+            .name(name)
+            .description(description)
+            .price(price)
+            .category(category)
+            .stock(new Stock(stockUnits))
+            .manufacturer(manufacturer)
+            .specs(List.of(spec))
+            .build();
+        spec.setProduct(product);
+        return product;
     }
 
     @Test
@@ -246,31 +257,47 @@ class ProductServiceIntegrationTest {
         var result = service.updateProduct(ID, updateData);
         
         // assert
-        assertNotEquals(updateData.getName(), result.getName());
-        assertNotEquals(updateData.getDescription(), result.getDescription());
-        assertNotEquals(updateData.getPrice(), result.getPrice());
-        assertNotEquals(updateData.getCategory(), result.getCategory().toString());
-        assertNotEquals(null, result.getManufacturer().getName());
+        assertNotNull(result.getName());
+        assertNotNull(result.getDescription());
+        assertNotNull(result.getPrice());
+        assertNotNull(result.getCategory());
+        assertNotNull(result.getManufacturer().getName());
     }
     @Test
     @DisplayName("Integration - Should update all attributes")
     void updateProductTest02() {
         // arrange
         Long ID = 1L;
-        ProductUpdateDTO updateData = new ProductUpdateDTO("cooler", "cooler", BigDecimal.valueOf(500), "COOLER", new ManufacturerDTO("INTEL"));
+        var EXPECTED_NAME = "update name";
+        var EXPECTED_DESCRIPTION = "update description";
+        var EXPECTED_PRICE = BigDecimal.valueOf(500);
+        var EXPECTED_CATEGORY = Category.COOLER.toString();
+        var EXPECTED_MANUFACTURER_NAME = this.manufacturersPersisted.get(0).getName();
+        ProductUpdateDTO updateData = new ProductUpdateDTO(EXPECTED_NAME, EXPECTED_DESCRIPTION, EXPECTED_PRICE, Category.fromString(EXPECTED_CATEGORY), new ManufacturerDTO(EXPECTED_MANUFACTURER_NAME));
 
         // act
         var result = service.updateProduct(ID, updateData);
         
         // assert
-        assertEquals(updateData.getName(), result.getName());
-        assertEquals(updateData.getDescription(), result.getDescription());
-        assertEquals(updateData.getCategory(), result.getCategory().toString());
-        assertEquals(updateData.getManufacturer().getName(), result.getManufacturer().getName());
+        assertEquals(EXPECTED_NAME, result.getName());
+        assertEquals(EXPECTED_DESCRIPTION, result.getDescription());
+        assertEquals(EXPECTED_CATEGORY, result.getCategory().toString());
+        assertEquals(EXPECTED_PRICE, result.getPrice());
+        assertEquals(EXPECTED_MANUFACTURER_NAME, result.getManufacturer().getName());
+    }
+    @Test
+    @DisplayName("Integration - Should fail when trying to update to a manufacturer that does not yet exist")
+    void updateProductTest03() {
+        // act
+        Long ID = 1L;
+        ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, null, new ManufacturerDTO("non-existent"));
+
+        // act and assert
+        assertThrows(EntityNotFoundException.class, () -> service.updateProduct(ID, updateData));
     }
     @Test
     @DisplayName("Integration - Should only update the manufacturer")
-    void updateProductTest03() {
+    void updateProductTest04() {
         // arrange
         Long ID = 1L;
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, null, new ManufacturerDTO("INTEL"));
@@ -286,123 +313,111 @@ class ProductServiceIntegrationTest {
         assertEquals(updateData.getManufacturer().getName(), result.getManufacturer().getName());
     }
     @Test
-    @DisplayName("Integration - Should fail when trying to update to a manufacturer that does not yet exist")
-    void updateProductTest04() {
-        // act
-        Long ID = 1L;
-        ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, null, new ManufacturerDTO("RANDOM"));
-
-        // act and assert
-        assertThrows(EntityNotFoundException.class, () -> service.updateProduct(ID, updateData));
-    }
-    @Test
     @DisplayName("Integration - Should only update the category")
     void updateProductTest05() {
         // arrange
         Long ID = 1L;
-        ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, "COOLER", null);
+        var EXPECTED_CATEGORY = Category.COOLER;
+        ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, EXPECTED_CATEGORY, null);
 
         // act
         var result = service.updateProduct(ID, updateData);
         
         // assert
-        assertEquals(updateData.getCategory(), result.getCategory().toString());
-        assertNotEquals(updateData.getName(), result.getName());
-        assertNotEquals(updateData.getDescription(), result.getDescription());
-        assertNotEquals(updateData.getPrice(), result.getPrice());
+        assertEquals(EXPECTED_CATEGORY.toString(), result.getCategory().toString());
+        assertNotNull(result.getName());
+        assertNotNull(result.getDescription());
+        assertNotNull(result.getPrice());
     }
     @Test
     @DisplayName("Integration - Should only update the price")
     void updateProductTest06() {
         // arrange
         Long ID = 1L;
-        ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, BigDecimal.valueOf(500), null, null);
+        var EXPECTED_PRICE = BigDecimal.valueOf(500);
+        ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, EXPECTED_PRICE, null, null);
 
         // act
         var result = service.updateProduct(ID, updateData);
         
         // assert
-        assertEquals(updateData.getPrice(), result.getPrice());
-        assertNotEquals(updateData.getCategory(), result.getCategory().toString());
-        assertNotEquals(updateData.getName(), result.getName());
-        assertNotEquals(updateData.getDescription(), result.getDescription());
+        assertEquals(EXPECTED_PRICE, result.getPrice());
+        assertNotNull(result.getCategory().toString());
+        assertNotNull(result.getName());
+        assertNotNull(result.getDescription());
     }
     @Test
     @DisplayName("Integration - Should only update the description")
     void updateProductTest07() {
         // arrange
         Long ID = 1L;
-        ProductUpdateDTO updateData = new ProductUpdateDTO(null, "updated", null, null, null);
+        var EXPECTED_DESCRIPTION = "update description";
+        ProductUpdateDTO updateData = new ProductUpdateDTO(null, EXPECTED_DESCRIPTION, null, null, null);
 
         // act
         var result = service.updateProduct(ID, updateData);
         
         // assert
-        assertEquals(updateData.getDescription(), result.getDescription());
-        assertNotEquals(updateData.getPrice(), result.getPrice());
-        assertNotEquals(updateData.getCategory(), result.getCategory().toString());
-        assertNotEquals(updateData.getName(), result.getName());
+        assertEquals(EXPECTED_DESCRIPTION, result.getDescription());
+        assertNotNull(result.getPrice());
+        assertNotNull(result.getCategory().toString());
+        assertNotNull(result.getName());
     }
     @Test
     @DisplayName("Integration - Should only update the name")
     void updateProductTest08() {
         // arrange
         Long ID = 1L;
-        ProductUpdateDTO updateData = new ProductUpdateDTO("updated", null, null, null, null);
+        var EXPECTED_NAME = "updated name";
+        ProductUpdateDTO updateData = new ProductUpdateDTO(EXPECTED_NAME, null, null, null, null);
 
         // act
         var result = service.updateProduct(ID, updateData);
         
         // assert
-        assertEquals(updateData.getName(), result.getName());
-        assertNotEquals(updateData.getDescription(), result.getDescription());
-        assertNotEquals(updateData.getPrice(), result.getPrice());
-        assertNotEquals(updateData.getCategory(), result.getCategory().toString());
+        assertEquals(EXPECTED_NAME, result.getName());
+        assertNotNull(result.getDescription());
+        assertNotNull(result.getPrice());
+        assertNotNull(result.getCategory());
 
     }
     @Test
     @DisplayName("Integration - Must reduce the units in stock")
     void updateStockByProductIdTest01() {
         // arrange
-        Long ID = 1L;
-        StockDTO writeOffStock = new StockDTO(-2);
-        Product target = repository.findById(ID).get();
-
+        StockDTO input = new StockDTO(-2);
+        
+        Product target = this.productsPersisted.get(0);
         Long TARGET_ID = target.getId();
-        String TARGET_NAME = target.getName();
-        Integer TARGET_UNITS = target.getStock().getUnit();
+        String EXPECTED_NAME = target.getName();
+        Integer EXPECTED_UNITS = target.getStock().getUnit() + input.getUnit();
 
         // act
-        var result = service.updateStockByProductId(ID, writeOffStock);
+        var result = service.updateStockByProductId(TARGET_ID, input);
 
         // assert
-        assertEquals(TARGET_UNITS - 2, result.getUnit());
-        assertNotEquals(TARGET_UNITS, result.getUnit());
-
+        assertEquals(EXPECTED_UNITS, result.getUnit());
+        assertEquals(EXPECTED_NAME, result.getName());
         assertEquals(TARGET_ID, result.getProductId());
-        assertEquals(TARGET_NAME, result.getName());
     }
     @Test
     @DisplayName("Integration - Must increase the units in stock")
     void updateStockByProductIdTest02() {
         // arrange
-        Long ID = 1L;
-        StockDTO writeOffStock = new StockDTO(2);
-        Product target = repository.findById(ID).get();
-
+        StockDTO input = new StockDTO(2);
+        
+        Product target = this.productsPersisted.get(0);
         Long TARGET_ID = target.getId();
-        String TARGET_NAME = target.getName();
-        Integer TARGET_UNITS = target.getStock().getUnit();
+        String EXPECTED_NAME = target.getName();
+        Integer EXPECTED_UNITS = target.getStock().getUnit() + input.getUnit();
 
         // act
-        var result = service.updateStockByProductId(ID, writeOffStock);
+        var result = service.updateStockByProductId(TARGET_ID, input);
 
         // assert
-        assertEquals(TARGET_UNITS + 2, result.getUnit());
-        assertNotEquals(TARGET_UNITS, result.getUnit());
-
+        assertEquals(EXPECTED_UNITS, result.getUnit());
+        assertEquals(EXPECTED_NAME, result.getName());
         assertEquals(TARGET_ID, result.getProductId());
-        assertEquals(TARGET_NAME, result.getName());
     }
     @Test
     @DisplayName("Integration - Should update all stocks")
@@ -466,65 +481,5 @@ class ProductServiceIntegrationTest {
 
         // act
         assertThrows(EntityNotFoundException.class, () -> service.createProduct(input));
-    }
-
-    void seedDatabase() {
-        var manufacturers = manufacturerRepository.saveAll(
-            List.of(new Manufacturer("AMD"), new Manufacturer("INTEL")));
-
-            ProductSpec spec1 = new ProductSpec("cores", "12");
-            Product product1 = Product.builder()
-                .name("aaa")
-                .description("ddd")
-                .price(BigDecimal.valueOf(1000))
-                .category(Category.CPU)
-                .stock(new Stock(1000))
-                .manufacturer(this.getManufacturer(manufacturers, "AMD"))
-                .specs(List.of(spec1))
-                .build();
-
-            ProductSpec spec2 = new ProductSpec("cores", "8");
-            Product product2 = Product.builder()
-                .name("bbb")
-                .description("ddd")
-                .price(BigDecimal.valueOf(100))
-                .category(Category.CPU)
-                .stock(new Stock(100))
-                .manufacturer(this.getManufacturer(manufacturers, "AMD"))
-                .specs(List.of(spec2))
-                .build();
-
-            ProductSpec spec3 = new ProductSpec("memmory size", "8GB");
-            Product product3 = Product.builder()
-                .name("ccc")
-                .description("ddd")
-                .price(BigDecimal.TEN)
-                .category(Category.GPU)
-                .stock(new Stock(10))
-                .manufacturer(this.getManufacturer(manufacturers, "INTEL"))
-                .specs(List.of(spec3))
-                .build();
-        spec1.setProduct(product1);
-        spec2.setProduct(product2);
-        spec3.setProduct(product3);
-        this.productsPersisted = repository.saveAll(List.of(product1, product2, product3));
-    }
-    private Manufacturer getManufacturer(List<Manufacturer> manufacturers, String name) {
-        return manufacturers.stream().filter(m -> m.getName().equalsIgnoreCase(name)).findFirst().get();
-    }
-
-    void truncateAllTables() {
-        Query set1 = entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0");
-
-        set1.executeUpdate();
-        Query s = entityManager.createNativeQuery("TRUNCATE TABLE product_specs");
-        s.executeUpdate();
-        Query p = entityManager.createNativeQuery("TRUNCATE TABLE products");
-        p.executeUpdate();
-        Query m = entityManager.createNativeQuery("TRUNCATE TABLE manufacturers");
-        m.executeUpdate();
-        
-        Query set2 = entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1");
-        set2.executeUpdate();
     }
 }
