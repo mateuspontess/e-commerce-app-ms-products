@@ -17,6 +17,6 @@ public class ProductUpdateDTO {
 	private String name;
 	private String description;
 	private BigDecimal price;
-	private String category;
+	private Category category;
 	private ManufacturerDTO manufacturer;
 }
