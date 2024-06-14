@@ -27,6 +27,7 @@ import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductPriceDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
+import br.com.ecommerce.products.model.product.ProductUpdateResponseDTO;
 import br.com.ecommerce.products.model.product.StockDTO;
 import br.com.ecommerce.products.model.product.StockResponseDTO;
 import br.com.ecommerce.products.service.ProductService;
@@ -104,9 +105,8 @@ public class ProductController {
 	
 	@PutMapping("/{productId}")
 	@Transactional
-	public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductUpdateDTO dto) {
-		service.updateProduct(productId, dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<ProductUpdateResponseDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductUpdateDTO dto) {
+		return ResponseEntity.ok().body(service.updateProduct(productId, dto));
 	}
 	
 	@PutMapping("/{productId}/stocks")
