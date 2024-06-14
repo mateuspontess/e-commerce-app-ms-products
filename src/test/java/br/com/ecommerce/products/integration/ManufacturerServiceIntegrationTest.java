@@ -21,11 +21,13 @@ import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.service.ManufacturerService;
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class ManufacturerServiceIntegrationTest {
 
     @Autowired
