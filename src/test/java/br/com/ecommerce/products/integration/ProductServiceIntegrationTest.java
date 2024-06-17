@@ -49,6 +49,7 @@ class ProductServiceIntegrationTest {
 
     @Autowired
     private ProductService service;
+    
     @Autowired
     private ProductRepository repository;
     @Autowired
@@ -69,20 +70,7 @@ class ProductServiceIntegrationTest {
         this.productsPersisted = repository.saveAll(List.of(p1, p2, p3));
     }
 
-    Product createProduct(Manufacturer manufacturer, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
-        ProductSpec spec = new ProductSpec(specAttribute, specValue);
-        Product product = Product.builder()
-            .name(name)
-            .description(description)
-            .price(price)
-            .category(category)
-            .stock(new Stock(stockUnits))
-            .manufacturer(manufacturer)
-            .specs(List.of(spec))
-            .build();
-        spec.setProduct(product);
-        return product;
-    }
+
 
     @Test
     @DisplayName("Integration - Must return Product details")
@@ -481,5 +469,20 @@ class ProductServiceIntegrationTest {
 
         // act
         assertThrows(EntityNotFoundException.class, () -> service.createProduct(input));
+    }
+
+    Product createProduct(Manufacturer manufacturer, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
+        ProductSpec spec = new ProductSpec(specAttribute, specValue);
+        Product product = Product.builder()
+            .name(name)
+            .description(description)
+            .price(price)
+            .category(category)
+            .stock(new Stock(stockUnits))
+            .manufacturer(manufacturer)
+            .specs(List.of(spec))
+            .build();
+        spec.setProduct(product);
+        return product;
     }
 }
