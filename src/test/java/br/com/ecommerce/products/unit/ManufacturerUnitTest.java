@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 
-public class ManufacturerTest {
+public class ManufacturerUnitTest {
 
     @Test
     @DisplayName("Test creating manufacturer with valid and invalid names")

@@ -16,7 +16,7 @@ import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.Stock;
 
-public class ProductTest {
+public class ProductUnitTest {
 
     @Test
     @DisplayName("Test creating product with invalid data")
