@@ -27,9 +27,7 @@ import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @Service
 public class ProductService {
 
