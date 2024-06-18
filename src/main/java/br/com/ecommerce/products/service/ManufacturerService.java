@@ -34,7 +34,7 @@ public class ManufacturerService {
 		return new ManufacturerResponseDTO(repository.save(new Manufacturer(dto.getName())));
 	}
 	
-	public ManufacturerResponseDTO updateManufacturer(Long id, ManufacturerDTO dto){
+	public ManufacturerResponseDTO updateManufacturerData(Long id, ManufacturerDTO dto){
 		Manufacturer mf = repository.findById(id).orElseThrow(EntityNotFoundException::new);
 		mf.updateName(dto.getName());
 		return new ManufacturerResponseDTO(mf);
