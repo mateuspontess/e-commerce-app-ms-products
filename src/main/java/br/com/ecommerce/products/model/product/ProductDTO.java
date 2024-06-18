@@ -7,6 +7,7 @@ import java.util.List;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,7 +34,7 @@ public class ProductDTO {
     @NotNull
 	@Valid
     private ManufacturerDTO manufacturer; // espera-se que já esteja criado no banco de dados
-    @NotNull
+    @NotEmpty
 	@Valid
     private List<ProductSpecDTO> specs = new ArrayList<>(); // cria junto com o objeto
 }
