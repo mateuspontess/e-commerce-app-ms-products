@@ -33,7 +33,7 @@ import br.com.ecommerce.products.model.product.StockResponseDTO;
 import br.com.ecommerce.products.service.ProductService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 
 @RestController
 @RequestMapping("/products")
@@ -44,12 +44,12 @@ public class ProductController {
 	
 	
 	@GetMapping("/{productId}")
-	public ResponseEntity<ProductResponseDTO> read(@PathVariable Long productId){
+	public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long productId){
 		return ResponseEntity.ok(service.getProduct(productId));
 	}
 	
 	@GetMapping
-	public ResponseEntity<?> readAllWithParams(
+	public ResponseEntity<?> getAllProductsByParams(
 			@PageableDefault(size = 10) Pageable pageable,
 	        @RequestParam(required = false) String name,
 	        @RequestParam(required = false) Category category,
@@ -67,13 +67,15 @@ public class ProductController {
 	@Transactional
 	public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody @Valid ProductDTO dto, UriComponentsBuilder uriBuilder) {
 		ProductResponseDTO responseBody = service.createProduct(dto);
-		var uri = uriBuilder.path("/publications/{productId}").buildAndExpand(responseBody.getId()).toUri();
+		var uri = uriBuilder.path("/products/{productId}").buildAndExpand(responseBody.getId()).toUri();
 		return ResponseEntity.created(uri).body(responseBody);
 	}
 	
 	@PostMapping("/stocks")
-	public ResponseEntity<List<StockResponseDTO>> verifyStocks(@RequestBody @Valid List<ProductIdAndUnitsDTO> dto) {
-		List<Product> outOfStock = service.verifyStocks(dto);
+	public ResponseEntity<List<StockResponseDTO>> verifyStocks(
+		@RequestBody @Valid @NotEmpty List<ProductIdAndUnitsDTO> dto
+		) {
+		List<Product> outOfStock = service.verifyProductsStocks(dto);
 		
 		List<StockResponseDTO> responseBody = null;
 		if(outOfStock.isEmpty()) {
@@ -90,13 +92,13 @@ public class ProductController {
 	@PostMapping("/specs")
 	public ResponseEntity<Page<ProductResponseDTO>> readAllBySpecs(
 			@PageableDefault(size = 10) Pageable pageable,
-			@RequestBody List<Map<String, String>> map
+			@RequestBody @Valid @NotEmpty List<Map<String, String>> map
 			) {
 		return ResponseEntity.ok(service.getAllBySpecs(pageable, map));
 	}
 	
 	@PostMapping("/prices")
-	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid @NotNull List<Long> productsIds){
+	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid @NotEmpty List<Long> productsIds){
 		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
 				.map(p -> new ProductPriceDTO(p.getId(), p.getPrice()))
 				.toList());
@@ -106,7 +108,7 @@ public class ProductController {
 	@PutMapping("/{productId}")
 	@Transactional
 	public ResponseEntity<ProductUpdateResponseDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductUpdateDTO dto) {
-		return ResponseEntity.ok().body(service.updateProduct(productId, dto));
+		return ResponseEntity.ok().body(service.updateProductData(productId, dto));
 	}
 	
 	@PutMapping("/{productId}/stocks")
