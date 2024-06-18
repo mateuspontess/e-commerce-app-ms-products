@@ -16,11 +16,12 @@ import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.Stock;
+import br.com.ecommerce.products.utils.RandomUtils;
 
 public class ProductUnitTest {
 
     @Test
-    @DisplayName("Unit - createProductTest - Product should not be created with invalid name entry")
+    @DisplayName("Unit - createProduct - Product must not be created with invalid name entry")
     void createProductTest01() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product(null, "Description", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
@@ -29,7 +30,7 @@ public class ProductUnitTest {
             () -> new Product("", "Description", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProductTest - Product should not be created with invalid description entry")
+    @DisplayName("Unit - createProduct - Product must not be created with invalid description entry")
     void createProductTest02() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", null, BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
@@ -38,7 +39,7 @@ public class ProductUnitTest {
             () -> new Product("Name", "", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProductTest - Product should not be created with invalid price entry")
+    @DisplayName("Unit - createProduct - Product must not be created with invalid price entry")
     void createProductTest03() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", "Description", null, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
@@ -47,43 +48,30 @@ public class ProductUnitTest {
             () -> new Product("Name", "Description", BigDecimal.valueOf(-1), Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProductTest - Product should not be created with invalid category entry")
+    @DisplayName("Unit - createProduct - Product must not be created with invalid category entry")
     void createProductTest04() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", "Description", BigDecimal.TEN, null, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProductTest - Product should not be created with invalid stock, manufacturer and specs entries")
+    @DisplayName("Unit - createProduct - Product must not be created with invalid stock, manufacturer and specs entries")
     void createProductTest06() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", "Description", BigDecimal.TEN, Category.CPU, null, null, null));
     }
     @Test
-    @DisplayName("Unit - createProductTest - Product should be created with valid entries")
+    @DisplayName("Unit - createProduct - Product must be created with valid entries")
     void createProductTest08() {
         assertDoesNotThrow( 
             () -> new Product("Name", "Description", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
 
     @Test
-    @DisplayName("Unit - update - Product should be updated with valid entries")
+    @DisplayName("Unit - update - Product must be updated with valid entries")
     void updateTest01() {
         // arrange
-        Product productDefault = Product.builder()
-            .name("Product-san")
-            .description("Description-san")
-            .price(BigDecimal.TEN)
-            .category(Category.CPU)
-            .stock(new Stock(200))
-            .manufacturer(new Manufacturer("AMD"))
-            .build();
-        Product dataForUpdate = Product.builder()
-            .name("Updated Name-san")
-            .description("Updated Description-san")
-            .price(BigDecimal.TEN)
-            .category(Category.CPU)
-            .manufacturer(new Manufacturer("INTEL"))
-            .build();
+        Product productDefault = RandomUtils.getRandomProduct();
+        Product dataForUpdate = RandomUtils.getRandomProduct();
 
         // act
         productDefault.update(dataForUpdate);
@@ -96,17 +84,10 @@ public class ProductUnitTest {
         assertEquals(dataForUpdate.getManufacturer(), productDefault.getManufacturer());
     }
     @Test
-    @DisplayName("Unit - update - Only name and description should not be updated")
+    @DisplayName("Unit - update - Only name and description must not be updated")
     void updateTest02() {
         // arrange
-        Product productDefault = Product.builder()
-            .name("Product-san")
-            .description("Description-san")
-            .price(BigDecimal.TEN)
-            .category(Category.CPU)
-            .stock(new Stock(200))
-            .manufacturer(new Manufacturer("AMD"))
-            .build();
+        Product productDefault = RandomUtils.getRandomProduct();
         Product dataForUpdate = Product.builder()
             .name("")
             .description("")
@@ -127,17 +108,10 @@ public class ProductUnitTest {
         assertEquals(dataForUpdate.getManufacturer(), productDefault.getManufacturer());
     }
     @Test
-    @DisplayName("Unit - update - Product should not updated with invalid entries")
+    @DisplayName("Unit - update - Product must not updated with invalid entries")
     void updateTest03() {
         // arrange
-        Product productDefault = Product.builder()
-            .name("Product-san")
-            .description("Description-san")
-            .price(BigDecimal.TEN)
-            .category(Category.CPU)
-            .stock(new Stock(200))
-            .manufacturer(new Manufacturer("AMD"))
-            .build();
+        Product productDefault = RandomUtils.getRandomProduct();
         Product dataForUpdate = Product.builder()
             .name("")
             .description("")
@@ -157,19 +131,12 @@ public class ProductUnitTest {
         assertNotEquals(dataForUpdate.getManufacturer(), productDefault.getManufacturer());
     }
 
-
     @Test
-    @DisplayName("Unit - update - Updating product stock")
+    @DisplayName("Unit - updateStockTest - Updating product stock")
     void updateStockTest01() {
         // arrange
         Product productDefault = Product.builder()
-            .id(1L)
-            .name("Product-san")
-            .description("Description-san")
-            .price(BigDecimal.TEN)
-            .category(Category.CPU)
             .stock(new Stock(100))
-            .manufacturer(new Manufacturer("AMD"))
             .build();
 
         // act and assert

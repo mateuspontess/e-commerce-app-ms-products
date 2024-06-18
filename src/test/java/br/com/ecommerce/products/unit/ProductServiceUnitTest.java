@@ -3,7 +3,6 @@ package br.com.ecommerce.products.unit;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -25,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.testcontainers.shaded.org.bouncycastle.asn1.cmp.Challenge.Rand;
 
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
@@ -42,6 +42,7 @@ import br.com.ecommerce.products.model.product.StockWriteOffDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
 import br.com.ecommerce.products.service.ProductService;
+import br.com.ecommerce.products.utils.RandomUtils;
 import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +55,8 @@ class ProductServiceUnitTest {
     @InjectMocks
     private ProductService service;
 
+    private final Product testProductDefault = RandomUtils.getRandomProduct();
+
     // manually inject ModelMapper
     @BeforeEach
     void setup() {
@@ -61,18 +64,10 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Test getting product details by ID")
+    @DisplayName("Unit - getProduct - Must return product details by ID")
     void getProductTest01() {
         // arrange
-        Product product = Product.builder()
-                .id(1L)
-                .name("Product-san")
-                .description("Description-san")
-                .price(BigDecimal.TEN)
-                .category(Category.CPU)
-                .stock(new Stock(200))
-                .manufacturer(new Manufacturer("AMD"))
-                .build();
+        Product product = this.testProductDefault;
 
         when(repository.findById(anyLong())).thenReturn(Optional.of(product));
         
@@ -87,28 +82,18 @@ class ProductServiceUnitTest {
 		assertEquals(product.getPrice(), result.getPrice());
 		assertEquals(product.getStock(), result.getStock());
 		assertEquals(product.getManufacturer().getName(), result.getManufacturer().getName());
-		assertNull(result.getSpecs());
 	}
     @Test
-    @DisplayName("Test getting product details by non-existent ID")
+    @DisplayName("Unit - getProduct - Must not return product details by non-existent ID")
     void getProductTest02() {
         assertThrows(EntityNotFoundException.class, () -> service.getProduct(10L));
 	}
 
     @Test
-    @DisplayName("Test getting all products with parameters")
+    @DisplayName("Unit - Must return all products by params")
     void getAllProductWithParamsTest01() {
         // arrange
-        Product product = Product.builder()
-                .id(1L)
-                .name("Product-san")
-                .description("Description-san")
-                .price(BigDecimal.TEN)
-                .category(Category.CPU)
-                .stock(new Stock(200))
-                .manufacturer(new Manufacturer("AMD"))
-                .specs(List.of(new ProductSpec()))
-                .build();
+        Product product = this.testProductDefault;
 
         when(repository.findAllByParams(any(), any(), any(), any(), any(), any()))
             .thenReturn(new PageImpl<Product>(List.of(product)));
@@ -130,19 +115,19 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Test getting all products by specifications")
+    @DisplayName("Unit - getAllBySpecs - Must return all products by specifications")
     void getAllBySpecsTest01() {
         // arrange
         Product product = Product.builder()
-                .id(1L)
-                .name("Product-san")
-                .description("Description-san")
-                .price(BigDecimal.TEN)
-                .category(Category.CPU)
-                .stock(new Stock(200))
-                .manufacturer(new Manufacturer("AMD"))
-                .specs(List.of(new ProductSpec()))
-                .build();
+            .id(1L)
+            .name("Product-san")
+            .description("Description-san")
+            .price(BigDecimal.TEN)
+            .category(Category.CPU)
+            .stock(new Stock(200))
+            .manufacturer(new Manufacturer("AMD"))
+            .specs(List.of(new ProductSpec()))
+            .build();
 
         when(repository.findProductsBySpecs(any(), any()))
             .thenReturn(new PageImpl<Product>(List.of(product)));
@@ -164,8 +149,8 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Test verifying stocks of products")
-    void verifyStocksTest01() {
+    @DisplayName("Unit - verifyProductsStocks - Must return products with insufficient stock")
+    void verifyProductsStocksTest01() {
         // arrange
         List<Product> products = List.of(
             Product.builder().id(1L).stock(new Stock(100)).build(),
@@ -180,20 +165,20 @@ class ProductServiceUnitTest {
         when(repository.findAllById(any())).thenReturn(products);
         
         // act
-        var result = service.verifyStocks(requestBody);
+        var result = service.verifyProductsStocks(requestBody);
 
         // assert
         assertEquals(1, result.size());
         assertEquals(result.get(0).getId(), products.get(1).getId());
     }
     @Test
-    @DisplayName("Test getting all products by list of IDs")
+    @DisplayName("Unit - getAllProductsByListOfIds - Must return all products by list of IDs")
     void getAllProductsByListOfIds01() {
         // arrange
         List<Product> products = List.of(
             Product.builder().id(1L).stock(new Stock(100)).build()
         );
-
+   
         when(repository.findAllById(any())).thenReturn(products);
         
         // act
@@ -205,63 +190,51 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Test updating product with full data")
+    @DisplayName("Unit - updateProduct - Update product with full data")
     void updateProductTest01() {
         // arrange
-        Manufacturer oldManufacturer = new Manufacturer("AMD");
-        Product product = Product.builder()
-                .name("Product-san")
-                .description("Description-san")
-                .price(BigDecimal.TEN)
-                .category(Category.CPU)
-                .manufacturer(oldManufacturer)
-                .build();
-
+        Product target = this.testProductDefault;
+        
+        ManufacturerDTO newManufacturer = new ManufacturerDTO("INTEL");
         ProductUpdateDTO requestBody = 
-            new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN, new ManufacturerDTO("INTEL"));
+            new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN, newManufacturer);
 
-        when(repository.getReferenceById(any())).thenReturn(product);
+        when(repository.getReferenceById(any())).thenReturn(target);
         when(manufacturerRepository.findByName(any())).thenReturn(Optional.of(new Manufacturer(requestBody.getManufacturer().getName())));
         
         // act
-        service.updateProduct(1L, requestBody);
+        service.updateProductData(1L, requestBody);
 
         // assert
-        assertEquals(requestBody.getName(), product.getName());
-        assertEquals(requestBody.getDescription(), product.getDescription());
-        assertEquals(requestBody.getPrice(), product.getPrice());
-        assertEquals(requestBody.getCategory(), product.getCategory());
-        assertEquals(requestBody.getManufacturer().getName(), product.getManufacturer().getName());
+        assertEquals(requestBody.getName(), target.getName());
+        assertEquals(requestBody.getDescription(), target.getDescription());
+        assertEquals(requestBody.getPrice(), target.getPrice());
+        assertEquals(requestBody.getCategory(), target.getCategory());
+        assertEquals(requestBody.getManufacturer().getName(), target.getManufacturer().getName());
     }
     @Test
-    @DisplayName("Test updating product with partial data")
+    @DisplayName("Unit - updateProduct - Must update product without a new manufacturer")
     void updateProductTest02() {
         // arrange
-        Product product = Product.builder()
-                .name("Product-san")
-                .description("Description-san")
-                .price(BigDecimal.TEN)
-                .category(Category.CPU)
-                .manufacturer(new Manufacturer("AMD"))
-                .build();
+        Product target = this.testProductDefault;
 
         ProductUpdateDTO requestBody = 
             new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN, null);
 
-        when(repository.getReferenceById(any())).thenReturn(product);
+        when(repository.getReferenceById(any())).thenReturn(target);
         
         // act
-        service.updateProduct(1L, requestBody);
+        service.updateProductData(1L, requestBody);
 
         // assert
-        assertEquals(requestBody.getName(), product.getName());
-        assertEquals(requestBody.getDescription(), product.getDescription());
-        assertEquals(requestBody.getPrice(), product.getPrice());
-        assertEquals(requestBody.getCategory(), product.getCategory());
+        assertEquals(requestBody.getName(), target.getName());
+        assertEquals(requestBody.getDescription(), target.getDescription());
+        assertEquals(requestBody.getPrice(), target.getPrice());
+        assertEquals(requestBody.getCategory(), target.getCategory());
     }
 
     @Test
-    @DisplayName("Test updating product stock by product ID")
+    @DisplayName("Unit - updateStockByProductId - Must update product stock by product ID")
     void updateStockByProductIdTest01() {
         // arrange
         Product product = Product.builder()
@@ -289,7 +262,7 @@ class ProductServiceUnitTest {
         );
     }
     @Test
-    @DisplayName("Test updating stocks of multiple products")
+    @DisplayName("Unit - updateStocks - Must update stocks of multiple products")
     void updateStocksTes01() {
         // arrange
         List<Product> products = List.of(
@@ -317,7 +290,7 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Test creating product with valid data")
+    @DisplayName("Unit - createProduct - Must create product with valid data")
     void createProductTest01() {
         // arrange
         ProductDTO requestBody = new ProductDTO(
