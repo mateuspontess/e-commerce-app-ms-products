@@ -53,8 +53,8 @@ class ManufacturerControllerIntegrationTest {
 
 
     @Test
-    @DisplayName("Integration - Create - Should return status 200")
-    void createTest01() throws IOException, Exception {
+    @DisplayName("Integration - createManufacturer - Should return status 200")
+    void createManufacturerTest01() throws IOException, Exception {
         // arrange
         String MANUFACTURER_NAME = "AMD";
         ManufacturerDTO requestBody = new ManufacturerDTO(MANUFACTURER_NAME);
@@ -68,10 +68,9 @@ class ManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.name").value(MANUFACTURER_NAME));
     }
-
     @Test
-    @DisplayName("Integration - Create - Should return status 400 and field error")
-    void createTest02() throws IOException, Exception {
+    @DisplayName("Integration - createManufacturer - Should return status 400 and field error")
+    void createManufacturerTest01Test02() throws IOException, Exception {
         // arrange
         ManufacturerDTO requestBody = new ManufacturerDTO("");
 
@@ -85,8 +84,8 @@ class ManufacturerControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Read all - Should return status 200 and expected response body")
-    void readAllTest01() throws IOException, Exception {
+    @DisplayName("Integration - getAllManufacturers - Should return status 200 and expected response body")
+    void getAllManufacturersTest01() throws IOException, Exception {
         // arrange
         var manufacturers = List.of(new Manufacturer("AMD"), new Manufacturer("INTEL"), new Manufacturer("NVIDIA"));
         repository.saveAll(manufacturers);
@@ -104,8 +103,8 @@ class ManufacturerControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Read by id - Should return status 200 and expected response body")
-    void readByIdTest01() throws IOException, Exception {
+    @DisplayName("Integration - getManufacturerById - Should return status 200 and expected response body")
+    void getManufacturerById() throws IOException, Exception {
         // arrange
         repository.save(new Manufacturer("MSI"));
 
@@ -117,8 +116,8 @@ class ManufacturerControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Update - Should return status 200 and expected response body")
-    void updateTest01() throws IOException, Exception {
+    @DisplayName("Integration - updateManufacturer - Should return status 200 and expected response body")
+    void updateManufacturerTest01() throws IOException, Exception {
         // arrange
         repository.save(new Manufacturer("Micro Start International"));
         var requestBody = new ManufacturerDTO("MSI");
@@ -133,8 +132,8 @@ class ManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.name").value(requestBody.getName()));
     }
     @Test
-    @DisplayName("Integration - Update - Should return status 400 and field error")
-    void updateTest02() throws IOException, Exception {
+    @DisplayName("Integration - updateManufacturer - Should return status 400 and field error")
+    void updateManufacturerTest02() throws IOException, Exception {
         // arrange
         repository.save(new Manufacturer("Micro Star International"));
         var requestBody = new ManufacturerDTO("");

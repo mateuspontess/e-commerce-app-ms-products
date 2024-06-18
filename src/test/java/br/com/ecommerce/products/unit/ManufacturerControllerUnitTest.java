@@ -46,8 +46,8 @@ class ManufacturerControllerUnitTest {
 
 
     @Test
-    @DisplayName("Unit - Create - Should return status 200")
-    void createTest01() throws IOException, Exception {
+    @DisplayName("Unit - createManufacturer - Must return status 200")
+    void createManufacturerTest01() throws IOException, Exception {
         // arrange
         ManufacturerDTO requestBody = new ManufacturerDTO("AMD");
         ManufacturerResponseDTO responseBody = new ManufacturerResponseDTO(1L, requestBody.getName());
@@ -64,10 +64,9 @@ class ManufacturerControllerUnitTest {
             
         verify(service).saveManufacturer(any());
     }
-
     @Test
-    @DisplayName("Unit - Create - Should return status 400")
-    void createTest02() throws IOException, Exception {
+    @DisplayName("Unit - createManufacturer - Must return status 400")
+    void createManufacturerTest02() throws IOException, Exception {
         // arrange
         ManufacturerDTO requestBody = new ManufacturerDTO("");
         ManufacturerResponseDTO responseBody = new ManufacturerResponseDTO(1L, requestBody.getName());
@@ -83,8 +82,8 @@ class ManufacturerControllerUnitTest {
     }
 
     @Test
-    @DisplayName("Unit - Read all - Should return status 200 and expected response body")
-    void readAllTest01() throws IOException, Exception {
+    @DisplayName("Unit - getAllManufacturers - Must return status 200 and expected response body")
+    void getAllManufacturersTest01() throws IOException, Exception {
         // arrange
         List<ManufacturerResponseDTO> responseBody = List.of(
             new ManufacturerResponseDTO(1L, "AMD"),
@@ -105,9 +104,10 @@ class ManufacturerControllerUnitTest {
 
         verify(service).getAll(any());
     }
+    
     @Test
-    @DisplayName("Unit - Read by id - Should return status 200 and expected response body")
-    void readByIdTest01() throws IOException, Exception {
+    @DisplayName("Unit - getManufacturerById - Must return status 200 and expected response body")
+    void getManufacturerByIdTest01() throws IOException, Exception {
         // arrange
         var responseBody = new ManufacturerResponseDTO(1L, "AMD");
         when(service.getById(anyLong())).thenReturn(responseBody);
@@ -122,12 +122,12 @@ class ManufacturerControllerUnitTest {
     }
 
     @Test
-    @DisplayName("Unit - Update - Should return status 200 and expected response body")
-    void updateTest01() throws IOException, Exception {
+    @DisplayName("Unit - updateManufacturerData - Must return status 200 and expected response body")
+    void updateManufacturerDataTest01() throws IOException, Exception {
         // arrange
         var requestBody = new ManufacturerDTO("MSI");
         var responseBody = new ManufacturerResponseDTO(1L, requestBody.getName());
-        when(service.updateManufacturer(anyLong(), any())).thenReturn(responseBody);
+        when(service.updateManufacturerData(anyLong(), any())).thenReturn(responseBody);
 
         // act and assert
         mvc.perform(
@@ -138,6 +138,6 @@ class ManufacturerControllerUnitTest {
             .andExpect(jsonPath("$.id").value("1"))
             .andExpect(jsonPath("$.name").value(responseBody.getName()));
 
-        verify(service).updateManufacturer(anyLong(), any());
+        verify(service).updateManufacturerData(anyLong(), any());
     }
 }

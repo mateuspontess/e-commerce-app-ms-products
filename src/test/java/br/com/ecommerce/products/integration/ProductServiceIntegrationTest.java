@@ -71,9 +71,8 @@ class ProductServiceIntegrationTest {
     }
 
 
-
     @Test
-    @DisplayName("Integration - Must return Product details")
+    @DisplayName("Integration - getProduct - Must return Product details")
     void getProductTest01() {
         // act
         ProductResponseDTO result = service.getProduct(1L);
@@ -82,25 +81,25 @@ class ProductServiceIntegrationTest {
 		assertNotNull(result);
     }
     @Test
-    @DisplayName("Integration - Should fail when finding non-existing Product")
+    @DisplayName("Integration - getProduct - Should fail when finding non-existing Product")
     void getProductTest02() {
         assertThrows(EntityNotFoundException.class, () -> service.getProduct(1000L));
 	}
 
     @Test
-    @DisplayName("Integration - Must return all products according to all parameters")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products according to all parameters")
     void getAllProductWithParamsTest01() {
         // act
-        var result = service
-            .getAllProductWithParams(
-                Pageable.unpaged(), "aaa", Category.CPU, BigDecimal.ZERO, BigDecimal.valueOf(1000), "AMD").getContent();
+        var result = service.getAllProductWithParams(
+            Pageable.unpaged(), "aaa", Category.CPU, BigDecimal.ZERO, BigDecimal.valueOf(1000), "AMD")
+            .getContent();
 
         // assert
         assertNotNull(result);
         assertEquals(1, result.size());
     }
     @Test
-    @DisplayName("Integration - Must return all products when all parameters are null")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products when all parameters are null")
     void getAllProductWithParamsTest02() {
         // act
         var result = service
@@ -112,7 +111,7 @@ class ProductServiceIntegrationTest {
         assertEquals(3, result.size());
     }
     @Test
-    @DisplayName("Integration - Must return all products with the name parameter")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products with the name parameter")
     void getAllProductWithParamsTest03() {
         // act
         var result = service
@@ -124,7 +123,7 @@ class ProductServiceIntegrationTest {
         assertEquals(1, result.size());
     }
     @Test
-    @DisplayName("Integration - Must return all products with the category parameter")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products with the category parameter")
     void getAllProductWithParamsTest04() {
         // act
         var result = service
@@ -135,7 +134,7 @@ class ProductServiceIntegrationTest {
         assertEquals(2, result.size());
     }
     @Test
-    @DisplayName("Integration - Must return all products with the minPrice parameter")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products with the minPrice parameter")
     void getAllProductWithParamsTest05() {
         // act
         var result1 = service
@@ -158,7 +157,7 @@ class ProductServiceIntegrationTest {
         assertEquals(0, result4.size());
     }
     @Test
-    @DisplayName("Integration - Must return all products with the maxPrice parameter")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products with the maxPrice parameter")
     void getAllProductWithParamsTest06() {
         // act
         var result1 = service
@@ -177,7 +176,7 @@ class ProductServiceIntegrationTest {
         assertEquals(0, result3.size());
     }
     @Test
-    @DisplayName("Integration - Must return all products with the manufacturer name parameter")
+    @DisplayName("Integration - getAllProductWithParams - Must return all products with the manufacturer name parameter")
     void getAllProductWithParamsTest07() {
         // act
         var result = service
@@ -189,7 +188,7 @@ class ProductServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Must return all products according to specs")
+    @DisplayName("Integration - getAllBySpecs - Must return all products according to specs")
     void getAllBySpecsTest01() {
         // assert
         List<Map<String, String>> specs = List.of(Map.of("attribute", "cores", "value", "12"));
@@ -202,21 +201,21 @@ class ProductServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Getting all products with insuficient stock")
-    void verifyStocksTest01() {
+    @DisplayName("Integration - verifyProductsStocks - Must return all products with insuficient stock")
+    void verifyProductsStocksTest01() {
         // assert
         List<ProductIdAndUnitsDTO> stockRequest = 
             List.of(new ProductIdAndUnitsDTO(1L, 1001), new ProductIdAndUnitsDTO(2L, 99));
 
         // act
-        var result = service.verifyStocks(stockRequest);
+        var result = service.verifyProductsStocks(stockRequest);
 
         // assert
         assertEquals(1, result.size());
     }
 
     @Test
-    @DisplayName("Integration - Getting all products by ID list")
+    @DisplayName("Integration - getAllProductsByListOfIds - Getting all products by ID list")
     void getAllProductsByListOfIdsTest01() {
         // act
         var result = service.getAllProductsByListOfIds(List.of(1L, 2L, 3L));
@@ -225,7 +224,7 @@ class ProductServiceIntegrationTest {
         assertEquals(3, result.size());
     }
     @Test
-    @DisplayName("Integration - Getting all products by list of non-existent IDs")
+    @DisplayName("Integration - getAllProductsByListOfIds - Getting all products by list of non-existent IDs")
     void getAllProductsByListOfIdsTest02() {
         // act
         var result = service.getAllProductsByListOfIds(List.of(1000L, 2000L, 3000L));
@@ -235,14 +234,14 @@ class ProductServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Should not update all attributes")
-    void updateProductTest01() {
+    @DisplayName("Integration - updateProductData - Should not update all attributes")
+    void updateProductDataTest01() {
         // arrange
         Long ID = 1L;
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, null, null);
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertNotNull(result.getName());
@@ -252,8 +251,8 @@ class ProductServiceIntegrationTest {
         assertNotNull(result.getManufacturer().getName());
     }
     @Test
-    @DisplayName("Integration - Should update all attributes")
-    void updateProductTest02() {
+    @DisplayName("Integration - updateProductData - Should update all attributes")
+    void updateProductDataTest02() {
         // arrange
         Long ID = 1L;
         var EXPECTED_NAME = "update name";
@@ -264,7 +263,7 @@ class ProductServiceIntegrationTest {
         ProductUpdateDTO updateData = new ProductUpdateDTO(EXPECTED_NAME, EXPECTED_DESCRIPTION, EXPECTED_PRICE, Category.fromString(EXPECTED_CATEGORY), new ManufacturerDTO(EXPECTED_MANUFACTURER_NAME));
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertEquals(EXPECTED_NAME, result.getName());
@@ -274,24 +273,24 @@ class ProductServiceIntegrationTest {
         assertEquals(EXPECTED_MANUFACTURER_NAME, result.getManufacturer().getName());
     }
     @Test
-    @DisplayName("Integration - Should fail when trying to update to a manufacturer that does not yet exist")
-    void updateProductTest03() {
+    @DisplayName("Integration - updateProductData - Should fail when trying to update to a manufacturer that does not yet exist")
+    void updateProductDataTest03() {
         // act
         Long ID = 1L;
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, null, new ManufacturerDTO("non-existent"));
 
         // act and assert
-        assertThrows(EntityNotFoundException.class, () -> service.updateProduct(ID, updateData));
+        assertThrows(EntityNotFoundException.class, () -> service.updateProductData(ID, updateData));
     }
     @Test
-    @DisplayName("Integration - Should only update the manufacturer")
-    void updateProductTest04() {
+    @DisplayName("Integration - updateProductData - Should only update the manufacturer")
+    void updateProductDataTest04() {
         // arrange
         Long ID = 1L;
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, null, new ManufacturerDTO("INTEL"));
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertNotEquals(updateData.getName(), result.getName());
@@ -301,15 +300,15 @@ class ProductServiceIntegrationTest {
         assertEquals(updateData.getManufacturer().getName(), result.getManufacturer().getName());
     }
     @Test
-    @DisplayName("Integration - Should only update the category")
-    void updateProductTest05() {
+    @DisplayName("Integration - updateProductData - Should only update the category")
+    void updateProductDataTest05() {
         // arrange
         Long ID = 1L;
         var EXPECTED_CATEGORY = Category.COOLER;
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, null, EXPECTED_CATEGORY, null);
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertEquals(EXPECTED_CATEGORY.toString(), result.getCategory().toString());
@@ -318,15 +317,15 @@ class ProductServiceIntegrationTest {
         assertNotNull(result.getPrice());
     }
     @Test
-    @DisplayName("Integration - Should only update the price")
-    void updateProductTest06() {
+    @DisplayName("Integration - updateProductData - Should only update the price")
+    void updateProductDataTest06() {
         // arrange
         Long ID = 1L;
         var EXPECTED_PRICE = BigDecimal.valueOf(500);
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, null, EXPECTED_PRICE, null, null);
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertEquals(EXPECTED_PRICE, result.getPrice());
@@ -335,15 +334,15 @@ class ProductServiceIntegrationTest {
         assertNotNull(result.getDescription());
     }
     @Test
-    @DisplayName("Integration - Should only update the description")
-    void updateProductTest07() {
+    @DisplayName("Integration - updateProductData - Should only update the description")
+    void updateProductDataTest07() {
         // arrange
         Long ID = 1L;
         var EXPECTED_DESCRIPTION = "update description";
         ProductUpdateDTO updateData = new ProductUpdateDTO(null, EXPECTED_DESCRIPTION, null, null, null);
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertEquals(EXPECTED_DESCRIPTION, result.getDescription());
@@ -352,15 +351,15 @@ class ProductServiceIntegrationTest {
         assertNotNull(result.getName());
     }
     @Test
-    @DisplayName("Integration - Should only update the name")
-    void updateProductTest08() {
+    @DisplayName("Integration - updateProductData - Should only update the name")
+    void updateProductDataTest08() {
         // arrange
         Long ID = 1L;
         var EXPECTED_NAME = "updated name";
         ProductUpdateDTO updateData = new ProductUpdateDTO(EXPECTED_NAME, null, null, null, null);
 
         // act
-        var result = service.updateProduct(ID, updateData);
+        var result = service.updateProductData(ID, updateData);
         
         // assert
         assertEquals(EXPECTED_NAME, result.getName());
@@ -370,7 +369,7 @@ class ProductServiceIntegrationTest {
 
     }
     @Test
-    @DisplayName("Integration - Must reduce the units in stock")
+    @DisplayName("Integration - updateStockByProductId - Must reduce the units in stock")
     void updateStockByProductIdTest01() {
         // arrange
         StockDTO input = new StockDTO(-2);
@@ -389,7 +388,7 @@ class ProductServiceIntegrationTest {
         assertEquals(TARGET_ID, result.getProductId());
     }
     @Test
-    @DisplayName("Integration - Must increase the units in stock")
+    @DisplayName("Integration - updateStockByProductId - Must increase the units in stock")
     void updateStockByProductIdTest02() {
         // arrange
         StockDTO input = new StockDTO(2);
@@ -408,7 +407,7 @@ class ProductServiceIntegrationTest {
         assertEquals(TARGET_ID, result.getProductId());
     }
     @Test
-    @DisplayName("Integration - Should update all stocks")
+    @DisplayName("Integration - updateStocks - Should update all stocks")
     void updateStocksTest01() {
         // arrange
         Map<Long, Integer> ORIGINAL_STOCKS_UNITS = this.productsPersisted.stream()
@@ -431,7 +430,7 @@ class ProductServiceIntegrationTest {
         });
     }
     @Test
-    @DisplayName("Integration - Should create a Product")
+    @DisplayName("Integration - createProduct - Should create a Product")
     void createProductTest01() {
         // arrange
         ProductDTO input = new ProductDTO(
@@ -456,7 +455,7 @@ class ProductServiceIntegrationTest {
         assertEquals(input.getSpecs().get(0).getValue(), result.getSpecs().get(0).getValue());
     }
     @Test
-    @DisplayName("Integration - Should fail when passing a non-existent Manufacturer")
+    @DisplayName("Integration - createProduct - Should fail when passing a non-existent Manufacturer")
     void createProductTest02() {
         // arrange
         ProductDTO input = new ProductDTO(

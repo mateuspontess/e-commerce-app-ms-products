@@ -33,8 +33,8 @@ class ManufacturerServiceUnitTest {
     private ManufacturerService service;
 
     @Test
-    @DisplayName("Test retrieving all manufacturers")
-    void getAllTest01() {
+    @DisplayName("Unit - getAllManufacturers - Must return all Manufacturers")
+    void getAllManufacturersTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
         when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(manufacturer)));
@@ -50,8 +50,8 @@ class ManufacturerServiceUnitTest {
 	}
 
     @Test
-    @DisplayName("Test retrieving manufacturer by ID")
-    void getByIdTest01() {
+    @DisplayName("Unit - getManufacturerById - Must return manufacturer by ID")
+    void getManufacturerByIdTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
         when(repository.findById(any())).thenReturn(Optional.of(manufacturer));
@@ -65,7 +65,7 @@ class ManufacturerServiceUnitTest {
 	}
 
     @Test
-    @DisplayName("Test saving manufacturer")
+    @DisplayName("Unit - saveManufacturer - Must save manufacturer")
     void saveManufacturerTest01() {
         // arrange
         ManufacturerDTO requestBody = new ManufacturerDTO("AMD");
@@ -79,15 +79,15 @@ class ManufacturerServiceUnitTest {
 	}
 
     @Test
-    @DisplayName("Test updating manufacturer")
-    void updateManufacturerTest01() {
+    @DisplayName("Unit - updateManufacturerData - Must update manufacturer")
+    void updateManufacturerDataTest01() {
         // arrange
         Manufacturer target = new Manufacturer("AMD");
         ManufacturerDTO requestBody = new ManufacturerDTO("INTEL");
         when(repository.findById(any())).thenReturn(Optional.of(target));
         
         // act
-        service.updateManufacturer(1L, requestBody);
+        service.updateManufacturerData(1L, requestBody);
 
         assertEquals(requestBody.getName(), target.getName());
 	}

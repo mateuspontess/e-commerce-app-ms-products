@@ -11,7 +11,7 @@ import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 public class ManufacturerUnitTest {
 
     @Test
-    @DisplayName("Test creating manufacturer with valid and invalid names")
+    @DisplayName("Unit - Creating manufacturer with valid and invalid names")
     void createManufacturerTest01() {
         assertThrows(IllegalArgumentException.class, () -> new Manufacturer(null));
         assertThrows(IllegalArgumentException.class, () -> new Manufacturer(""));
@@ -20,7 +20,7 @@ public class ManufacturerUnitTest {
     }
 
     @Test
-    @DisplayName("Test updating manufacturer name with valid and invalid names")
+    @DisplayName("Unit - Updating manufacturer name with valid and invalid names")
     void updateName() {
         Manufacturer manufacturer = new Manufacturer("AMD");
         assertThrows(IllegalArgumentException.class, () -> manufacturer.updateName(null));

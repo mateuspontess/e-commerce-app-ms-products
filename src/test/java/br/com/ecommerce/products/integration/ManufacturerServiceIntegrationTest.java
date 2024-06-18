@@ -37,7 +37,7 @@ class ManufacturerServiceIntegrationTest {
 
 
     @Test
-    @DisplayName("Integration - Get all - Must return a list of ManufacturerResponseDTO")
+    @DisplayName("Integration - getAll - Must return a list of ManufacturerResponseDTO")
     void getAllTest01() {
         // arrange
         var persistedNames = repository.saveAll(List.of(new Manufacturer("Corsair"), new Manufacturer("Logitech"), new Manufacturer("Redragon")))
@@ -57,7 +57,7 @@ class ManufacturerServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Get by id - Must return a ManufacturerResponseDTO")
+    @DisplayName("Integration - getById - Must return a ManufacturerResponseDTO")
     void getByIdTest01() {
         // arrange
         var persisted = repository.save(new Manufacturer("Corsair"));
@@ -70,7 +70,7 @@ class ManufacturerServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Save manufacturer - Must return a ManufacturerResponseDTO")
+    @DisplayName("Integration - saveManufacturer - Must return a ManufacturerResponseDTO")
     void saveManufacturerTest01() {
         // act
         ManufacturerResponseDTO result = service.saveManufacturer(new ManufacturerDTO("LIAN LI"));
@@ -81,14 +81,14 @@ class ManufacturerServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Update manufacturer - Must return a ManufacturerResponseDTO updated")
-    void updateManufacturerTest01() {
+    @DisplayName("Integration - updateManufacturerData - Must return a ManufacturerResponseDTO updated")
+    void updateManufacturerDataTest01() {
         // arrange
         repository.save(new Manufacturer("Cooler Master"));
 
         // act
         String NEW_NAME = "CoolerMaster";
-        ManufacturerResponseDTO updated = service.updateManufacturer(1L, new ManufacturerDTO(NEW_NAME));
+        ManufacturerResponseDTO updated = service.updateManufacturerData(1L, new ManufacturerDTO(NEW_NAME));
 
         // assert
         assertEquals(NEW_NAME.toUpperCase(), updated.getName());
