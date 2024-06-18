@@ -9,6 +9,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -16,7 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	
-	private final String METHOD_ARGUMENT_NOT_VALID_MESSAGE = "Input validation error";
+	private final String INPUT_VALIDATION_ERROR = "Input validation error";
 	private final String INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error";
     
 
@@ -38,12 +39,16 @@ public class GlobalExceptionHandler {
     			.badRequest()
     			.body(new ErrorMessageWithFields(
 					HttpStatus.BAD_REQUEST.value(),
-					METHOD_ARGUMENT_NOT_VALID_MESSAGE,
+					INPUT_VALIDATION_ERROR,
 					fields
 					)
 				);
     }
-
+	@ExceptionHandler(HandlerMethodValidationException.class)
+	public ResponseEntity<ErrorMessage> handlerErro400(HandlerMethodValidationException ex) {
+		System.out.println(ex);
+		return ResponseEntity.badRequest().body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), INPUT_VALIDATION_ERROR));
+	}
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorMessage> handlerErro400(IllegalArgumentException ex) {
 		return ResponseEntity.badRequest().body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
