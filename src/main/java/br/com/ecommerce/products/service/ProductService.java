@@ -42,9 +42,8 @@ public class ProductService {
 
 
 	public ProductResponseDTO getProduct(Long id) {
-		Product product = productRepository
-				.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		Product product = productRepository.findById(id)
+			.orElseThrow(EntityNotFoundException::new);
 		product.getSpecs();
 
 		return mapper.map(product, ProductResponseDTO.class);
@@ -59,19 +58,19 @@ public class ProductService {
 			String manufacturer) {
 		
 		return productRepository
-				.findAllByParams(pageable, name, category, minPrice, maxPrice, manufacturer)
-				.map(ProductResponseDTO::new);
+			.findAllByParams(pageable, name, category, minPrice, maxPrice, manufacturer)
+			.map(ProductResponseDTO::new);
 	}
 	
 	public Page<ProductResponseDTO> getAllBySpecs(Pageable pageable, List<Map<String, String>> map) {
 		return productRepository
-				.findProductsBySpecs(pageable, map)
-				.map(ProductResponseDTO::new);
+			.findProductsBySpecs(pageable, map)
+			.map(ProductResponseDTO::new);
 	}
 	
-	public List<Product> verifyStocks(List<ProductIdAndUnitsDTO> productsRequest) {
+	public List<Product> verifyProductsStocks(List<ProductIdAndUnitsDTO> productsRequest) {
 		Map<Long, Integer> unitiesRequested = productsRequest.stream()
-				.collect(Collectors.toMap(p -> p.getId(), p -> p.getUnit()));
+			.collect(Collectors.toMap(p -> p.getId(), p -> p.getUnit()));
 		
 		return this.getAllProductsByListOfIds(productsRequest.stream()
 			.map(ProductIdAndUnitsDTO::getId)
@@ -86,7 +85,7 @@ public class ProductService {
 		return productRepository.findAllById(productsIds);
 	}
 	
-	public ProductUpdateResponseDTO updateProduct(Long id, ProductUpdateDTO dto) {
+	public ProductUpdateResponseDTO updateProductData(Long id, ProductUpdateDTO dto) {
 		Product currentProduct = productRepository.getReferenceById(id);
 		Product updateData = mapper.map(dto, Product.class);
 		
@@ -97,8 +96,8 @@ public class ProductService {
 			currentManufacturer.removeProduct(currentProduct);
 			
 			Manufacturer newManufacturer = manufacturerRepository
-					.findByName(updateData.getManufacturer().getName())
-					.orElseThrow(() -> new EntityNotFoundException("Manufacturer not found. Create a Manufacturer to link it to a product"));
+				.findByName(updateData.getManufacturer().getName())
+				.orElseThrow(() -> new EntityNotFoundException("Manufacturer not found. Create a Manufacturer to link it to a product"));
 			updateData.setManufacturer(newManufacturer);
 			newManufacturer.addProduct(currentProduct);
 
@@ -119,13 +118,13 @@ public class ProductService {
 	}
 	public void updateStocks(List<StockWriteOffDTO> dto) {
 		Map<Long, Integer> writeOffValueMap = dto.stream()
-				.collect(Collectors.toMap(StockWriteOffDTO::getProductId, StockWriteOffDTO::getUnit));
+			.collect(Collectors.toMap(StockWriteOffDTO::getProductId, StockWriteOffDTO::getUnit));
 		
 		productRepository.findAllById(dto.stream()
-				.map(StockWriteOffDTO::getProductId)
-				.toList()
-				)
-				.forEach(p -> p.updateStock(writeOffValueMap.get(p.getId())));
+			.map(StockWriteOffDTO::getProductId)
+			.toList()
+			)
+			.forEach(p -> p.updateStock(writeOffValueMap.get(p.getId())));
 	}
 	
 	
@@ -138,11 +137,12 @@ public class ProductService {
 		
 		return new ProductResponseDTO(product);
 	}
+
 	private void setManufacturer(Product product) {
 		Manufacturer mf = manufacturerRepository
-				.findByName(product.getManufacturer().getName().toUpperCase())
-				.orElseThrow(EntityNotFoundException::new);
-		
+			.findByName(product.getManufacturer().getName().toUpperCase())
+			.orElseThrow(EntityNotFoundException::new);
+
 		product.setManufacturer(mf);
 	}
 	private void createSpec(Product product) {
