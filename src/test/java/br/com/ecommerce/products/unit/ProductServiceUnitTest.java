@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.testcontainers.shaded.org.bouncycastle.asn1.cmp.Challenge.Rand;
 
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
@@ -57,12 +58,12 @@ class ProductServiceUnitTest {
 
     private final Product testProductDefault = RandomUtils.getRandomProduct();
 
-    // manually inject ModelMapper
     @BeforeEach
     void setup() {
-        this.service = new ProductService(repository, manufacturerRepository, new ModelMapper());
+        ReflectionTestUtils.setField(service, "mapper", new ModelMapper());
     }
 
+    
     @Test
     @DisplayName("Unit - getProduct - Must return product details by ID")
     void getProductTest01() {
