@@ -30,25 +30,25 @@ public class ManufacturerController {
 	
 	@PostMapping
 	@Transactional
-	public ResponseEntity<ManufacturerResponseDTO> create(@RequestBody @Valid ManufacturerDTO dto, UriComponentsBuilder uriBuilder){
+	public ResponseEntity<ManufacturerResponseDTO> createManufacturer(@RequestBody @Valid ManufacturerDTO dto, UriComponentsBuilder uriBuilder){
 		ManufacturerResponseDTO responseBody = service.saveManufacturer(dto);
 		var uri = uriBuilder.path("/manufacturers/{id}").buildAndExpand(responseBody.getId()).toUri();
 		return ResponseEntity.created(uri).body(responseBody);
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<ManufacturerResponseDTO>> readAll(@PageableDefault(size = 10) Pageable pageable){
+	public ResponseEntity<Page<ManufacturerResponseDTO>> getAllManufacturers(@PageableDefault(size = 10) Pageable pageable){
 		Page<ManufacturerResponseDTO> dto = service.getAll(pageable);
 		return ResponseEntity.ok(dto);
 	}
 	@GetMapping("/{id}")
-	public ResponseEntity<ManufacturerResponseDTO> readById(@PathVariable Long id){
+	public ResponseEntity<ManufacturerResponseDTO> getManufacturerById(@PathVariable Long id){
 		return ResponseEntity.ok(service.getById(id));
 	}
 	
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<ManufacturerResponseDTO> update(@PathVariable Long id, @RequestBody @Valid ManufacturerDTO dto){
-		return ResponseEntity.ok().body(service.updateManufacturer(id, dto));
+	public ResponseEntity<ManufacturerResponseDTO> updateManufacturer(@PathVariable Long id, @RequestBody @Valid ManufacturerDTO dto){
+		return ResponseEntity.ok().body(service.updateManufacturerData(id, dto));
 	}
 }
