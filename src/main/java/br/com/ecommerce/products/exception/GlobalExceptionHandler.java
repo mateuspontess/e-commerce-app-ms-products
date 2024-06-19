@@ -36,13 +36,13 @@ public class GlobalExceptionHandler {
     	var fields = ex.getFieldErrors().stream().collect(Collectors.toMap(f -> f.getField().toString(), f -> f.getDefaultMessage()));
     	
     	return ResponseEntity
-    			.badRequest()
-    			.body(new ErrorMessageWithFields(
-					HttpStatus.BAD_REQUEST.value(),
-					INPUT_VALIDATION_ERROR,
-					fields
-					)
-				);
+			.badRequest()
+			.body(new ErrorMessageWithFields(
+				HttpStatus.BAD_REQUEST.value(),
+				INPUT_VALIDATION_ERROR,
+				fields
+				)
+			);
     }
 	@ExceptionHandler(HandlerMethodValidationException.class)
 	public ResponseEntity<ErrorMessage> handlerErro400(HandlerMethodValidationException ex) {
@@ -62,9 +62,10 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorMessage> handlerErro415(HttpMediaTypeNotSupportedException ex) {
         String unsupported = ex.getContentType() != null ? ex.getContentType().getType() + "/" + ex.getContentType().getSubtype() : "unknown";
+
         String supported = ex.getSupportedMediaTypes().stream()
-                              .map(mediaType -> mediaType.getType() + "/" + mediaType.getSubtype())
-                              .collect(Collectors.joining(", "));
+			.map(mediaType -> mediaType.getType() + "/" + mediaType.getSubtype())
+			.collect(Collectors.joining(", "));
         String message = String.format("Unsupported media type '%s'. Supported media types are: %s", unsupported, supported);
 
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value()).body(new ErrorMessage(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), message));
@@ -74,12 +75,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorMessage> handleError500(Exception ex) {
     	ex.printStackTrace();
         return ResponseEntity
-        		.internalServerError()
-        		.body(new ErrorMessage(
-					HttpStatus.INTERNAL_SERVER_ERROR.value(),
-					INTERNAL_SERVER_ERROR_MESSAGE
-					)
-				);
+			.internalServerError()
+			.body(new ErrorMessage(
+				HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				INTERNAL_SERVER_ERROR_MESSAGE
+				)
+			);
     }
 
 	private record ErrorMessage(int status, Object error) {}

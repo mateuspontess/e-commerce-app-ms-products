@@ -36,6 +36,6 @@ public class ProductResponseDTO {
     	this.category = product.getCategory();
     	this.manufacturer = new ManufacturerResponseDTO(product.getManufacturer());
     	this.specs.addAll(product.getSpecs().stream()
-    			.map(s -> new ProductSpecDTO(s)).toList());
+			.map(s -> new ProductSpecDTO(s)).toList());
     }
 }

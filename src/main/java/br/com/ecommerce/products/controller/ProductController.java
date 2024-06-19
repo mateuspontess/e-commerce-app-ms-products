@@ -50,16 +50,16 @@ public class ProductController {
 	
 	@GetMapping
 	public ResponseEntity<?> getAllProductsByParams(
-			@PageableDefault(size = 10) Pageable pageable,
-	        @RequestParam(required = false) String name,
-	        @RequestParam(required = false) Category category,
-	        @RequestParam(required = false) BigDecimal minPrice,
-	        @RequestParam(required = false) BigDecimal maxPrice,
-	        @RequestParam(required = false) String manufacturer
-	        ){
+		@PageableDefault(size = 10) Pageable pageable,
+		@RequestParam(required = false) String name,
+		@RequestParam(required = false) Category category,
+		@RequestParam(required = false) BigDecimal minPrice,
+		@RequestParam(required = false) BigDecimal maxPrice,
+		@RequestParam(required = false) String manufacturer
+		){
 		
 		return ResponseEntity.ok(service
-				.getAllProductWithParams(pageable, name, category, minPrice, maxPrice, manufacturer));
+			.getAllProductWithParams(pageable, name, category, minPrice, maxPrice, manufacturer));
 	}
 	
 	
@@ -100,8 +100,8 @@ public class ProductController {
 	@PostMapping("/prices")
 	public ResponseEntity<List<ProductPriceDTO>> getPrices(@RequestBody @Valid @NotEmpty List<Long> productsIds){
 		return ResponseEntity.ok(service.getAllProductsByListOfIds(productsIds).stream()
-				.map(p -> new ProductPriceDTO(p.getId(), p.getPrice()))
-				.toList());
+			.map(p -> new ProductPriceDTO(p.getId(), p.getPrice()))
+			.toList());
 	}
 	
 	

@@ -6,8 +6,8 @@ import org.springframework.test.context.ContextConfiguration;
 
 import br.com.ecommerce.products.config.Configs;
 
-@ContextConfiguration(classes = Configs.class)
 @SpringBootTest
+@ContextConfiguration(classes = Configs.class)
 class ProductsApplicationTests {
 	@Test
 	void contextLoads() {
