@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -57,28 +58,31 @@ class ManufacturerControllerUnitTest {
         mvc.perform(
             post("/manufacturers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(responseBody.getId()))
-            .andExpect(jsonPath("$.name").value(responseBody.getName()));
+                .content(manufacturerDTOJson.write(requestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(responseBody.getId()))
+        .andExpect(jsonPath("$.name").value(responseBody.getName()));
             
         verify(service).saveManufacturer(any());
     }
     @Test
-    @DisplayName("Unit - createManufacturer - Must return status 400")
+    @DisplayName("Unit - createManufacturer - Must return status 400 when request body is invalid")
     void createManufacturerTest02() throws IOException, Exception {
         // arrange
-        ManufacturerDTO requestBody = new ManufacturerDTO("");
-        ManufacturerResponseDTO responseBody = new ManufacturerResponseDTO(1L, requestBody.getName());
-        when(service.saveManufacturer(any())).thenReturn(responseBody);
+        ManufacturerDTO invalidRequestBody = new ManufacturerDTO("");
 
-        // act and assert
+        // act
         mvc.perform(
             post("/manufacturers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+                .content(manufacturerDTOJson.write(invalidRequestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
     }
 
     @Test
@@ -87,22 +91,35 @@ class ManufacturerControllerUnitTest {
         // arrange
         List<ManufacturerResponseDTO> responseBody = List.of(
             new ManufacturerResponseDTO(1L, "AMD"),
-            new ManufacturerResponseDTO(2L, "INTEL"),
-            new ManufacturerResponseDTO(3L, "NVIDIA"));
-        when(service.getAll(any(Pageable.class))).thenReturn(new PageImpl<>(responseBody));
+            new ManufacturerResponseDTO(2L, "INTEL")
+        );
+        when(service.findAllManufacturers(any(Pageable.class))).thenReturn(new PageImpl<>(responseBody));
 
-        // act and assert
+        var EXPECTED_ID_1 = responseBody.get(0).getId();
+        var EXPECTED_NAME_1 = responseBody.get(0).getName();
+
+        var EXPECTED_ID_2 = responseBody.get(1).getId();
+        var EXPECTED_NAME_2 = responseBody.get(1).getName();
+
+        var EXPECTED_ARRAY_SIZE = responseBody.size();
+
+        // act
         mvc.perform(
             get("/manufacturers")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content").isArray())
-            .andExpect(jsonPath("$.content", hasSize(3)))
-            .andExpect(jsonPath("$.content[0].name").value(responseBody.get(0).getName()))
-            .andExpect(jsonPath("$.content[1].name").value(responseBody.get(1).getName()))
-            .andExpect(jsonPath("$.content[2].name").value(responseBody.get(2).getName()));
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+        // assert
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content").isArray())
+        .andExpect(jsonPath("$.content", hasSize(EXPECTED_ARRAY_SIZE)))
 
-        verify(service).getAll(any());
+        .andExpect(jsonPath("$.content[0].id").value(EXPECTED_ID_1))
+        .andExpect(jsonPath("$.content[0].name").value(EXPECTED_NAME_1))
+
+        .andExpect(jsonPath("$.content[1].id").value(EXPECTED_ID_2))
+        .andExpect(jsonPath("$.content[1].name").value(EXPECTED_NAME_2));
+
+        verify(service).findAllManufacturers(any());
     }
     
     @Test
@@ -110,15 +127,19 @@ class ManufacturerControllerUnitTest {
     void getManufacturerByIdTest01() throws IOException, Exception {
         // arrange
         var responseBody = new ManufacturerResponseDTO(1L, "AMD");
-        when(service.getById(anyLong())).thenReturn(responseBody);
+        when(service.findManufacturerById(anyLong())).thenReturn(responseBody);
 
-        // act and assert
+        // act
         mvc.perform(
             get("/manufacturers/1")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+        // assert
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(responseBody.getId()))
+        .andExpect(jsonPath("$.name").value(responseBody.getName()));
 
-        verify(service).getById(any());
+        verify(service).findManufacturerById(any());
     }
 
     @Test
@@ -133,11 +154,30 @@ class ManufacturerControllerUnitTest {
         mvc.perform(
             put("/manufacturers/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value("1"))
-            .andExpect(jsonPath("$.name").value(responseBody.getName()));
+                .content(manufacturerDTOJson.write(requestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value("1"))
+        .andExpect(jsonPath("$.name").value(responseBody.getName()));
 
         verify(service).updateManufacturerData(anyLong(), any());
+    }
+    @Test
+    @DisplayName("Unit - updateManufacturerData - Must return status 400 when request body is invalid")
+    void updateManufacturerDataTest02() throws IOException, Exception {
+        // arrange
+        var invalidRequestBody = new ManufacturerDTO("");
+
+        // act and assert
+        mvc.perform(
+            put("/manufacturers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(manufacturerDTOJson.write(invalidRequestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
     }
 }

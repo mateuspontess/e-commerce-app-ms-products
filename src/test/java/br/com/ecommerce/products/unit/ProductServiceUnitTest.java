@@ -25,7 +25,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.testcontainers.shaded.org.bouncycastle.asn1.cmp.Challenge.Rand;
 
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
@@ -91,7 +90,7 @@ class ProductServiceUnitTest {
 	}
 
     @Test
-    @DisplayName("Unit - Must return all products by params")
+    @DisplayName("Unit - getAllProductWithParams - Must return all products by params")
     void getAllProductWithParamsTest01() {
         // arrange
         Product product = this.testProductDefault;
@@ -104,7 +103,7 @@ class ProductServiceUnitTest {
             .getAllProductWithParams(PageRequest.of(0, 10), null, null, null, null, null)
             .getContent()
             .get(0);
-
+            
         // assert
         assertNotNull(result);
         assertEquals(product.getId(), result.getId());

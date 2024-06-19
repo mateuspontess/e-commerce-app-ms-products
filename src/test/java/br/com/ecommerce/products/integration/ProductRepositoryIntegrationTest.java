@@ -49,8 +49,9 @@ class ProductRepositoryIntegrationTest {
         createAndSaveProduct(repository, manufacturersPersisted.get(1), "ccc", "ddd", BigDecimal.TEN, Category.GPU, 10, "memory size", "8GB");
     }
 
+
     @Test
-    @DisplayName("Integration - Must return correct product data based on parameters")
+    @DisplayName("Integration - findAllByParams - Must return correct product data based on parameters")
     void findAllByParamsTest01() {
         var sizeResult = repository.findAllByParams(pageable, null, null, null, null, null).getContent().size();
         assertEquals(repository.count(), sizeResult, "The total number of products should match the persisted products");
@@ -72,7 +73,7 @@ class ProductRepositoryIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Must return correct products based on specs")
+    @DisplayName("Integration - findProductsBySpecs - Must return correct products based on specs")
     void findProductsBySpecsTest01() {
         // arrange
         List<Map<String, String>> specs = List.of(Map.of("attribute", "cores", "value", "12"));

@@ -87,23 +87,9 @@ class ProductControllerIntegrationTest {
         this.productsPersisted = repository.saveAll(List.of(p1, p2, p3));
     }
 
-    Product createProduct(Manufacturer manufacturer, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
-        ProductSpec spec = new ProductSpec(specAttribute, specValue);
-        Product product = Product.builder()
-            .name(name)
-            .description(description)
-            .price(price)
-            .category(category)
-            .stock(new Stock(stockUnits))
-            .manufacturer(manufacturer)
-            .specs(List.of(spec))
-            .build();
-        spec.setProduct(product);
-        return product;
-    }
 
     @Test
-    @DisplayName("Integration - Must return status 201 and product data")
+    @DisplayName("Integration - createProduct - Must return status 201 and product data")
         void createProductTest01() throws IOException, Exception {
         // arrange
         ProductDTO input = new ProductDTO(
@@ -115,9 +101,10 @@ class ProductControllerIntegrationTest {
             List.of(new ProductSpecDTO("read", "7500MB/s")));
         
         // act
-        mvc.perform(post("/products")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(productDTOJson.write(input).getJson())
+        mvc.perform(
+            post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productDTOJson.write(input).getJson())
         )
         // assert
         .andExpect(status().isCreated())
@@ -132,7 +119,7 @@ class ProductControllerIntegrationTest {
         .andExpect(jsonPath("$.specs[0].value").value(input.getSpecs().get(0).getValue()));
     }
     @Test
-    @DisplayName("Integration - Must return status 400")
+    @DisplayName("Integration - createProduct - Must return status 400")
     void createProductTest02() throws IOException, Exception {
         // arrange
         ProductDTO input = new ProductDTO(
@@ -145,55 +132,73 @@ class ProductControllerIntegrationTest {
             null);
         
         // act
-        mvc.perform(post("/products")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(productDTOJson.write(input).getJson())
+        mvc.perform(
+            post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productDTOJson.write(input).getJson())
         )
         // assert
+        .andExpect(jsonPath("$.fields.name").exists())
+        .andExpect(jsonPath("$.fields.description").exists())
+        .andExpect(jsonPath("$.fields.price").exists())
+        .andExpect(jsonPath("$.fields.category").exists())
+        .andExpect(jsonPath("$.fields.stock").exists())
+        .andExpect(jsonPath("$.fields.manufacturer").exists())
+        .andExpect(jsonPath("$.fields.specs").exists())
         .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Integration - Must return status 207 and product stock")
+    @DisplayName("Integration - verifyStocks - Must return status 207 and product stock")
     void verifyStocksTest01() throws IOException, Exception {
         // arrange
-        int CURRENT_PRODUCT_STOCK_1 = productsPersisted.get(0).getStock().getUnit();
-        int CURRENT_PRODUCT_STOCK_2 = productsPersisted.get(1).getStock().getUnit();
+        Product product_1 = productsPersisted.get(0);
+        Product product_2 = productsPersisted.get(1);
+
+        var EXPECTED_ID_1 = product_1.getId();
+        var EXPECTED_NAME_1 = product_1.getName();
+        int CURRENT_PRODUCT_STOCK_1 = product_1.getStock().getUnit();
+        
+        var EXPECTED_ID_2 = product_2.getId();
+        var EXPECTED_NAME_2 = product_2.getName();
+        int CURRENT_PRODUCT_STOCK_2 = product_2.getStock().getUnit();
 
         List<ProductIdAndUnitsDTO> requestBody = List.of(
             new ProductIdAndUnitsDTO(1L, CURRENT_PRODUCT_STOCK_1 + 1), // passes quantities beyond what is available
             new ProductIdAndUnitsDTO(2L, CURRENT_PRODUCT_STOCK_2 + 1)
         );
-        
+
         // act
-        mvc.perform(post("/products/stocks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isMultiStatus())
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$", hasSize(requestBody.size())))
 
-        .andExpect(jsonPath("$[0].productId").exists())
-        .andExpect(jsonPath("$[0].name").exists())
-        .andExpect(jsonPath("$[0].unit").exists())
+        .andExpect(jsonPath("$[0].productId").value(EXPECTED_ID_1))
+        .andExpect(jsonPath("$[0].name").value(EXPECTED_NAME_1))
+        .andExpect(jsonPath("$[0].unit").value(CURRENT_PRODUCT_STOCK_1))
 
-        .andExpect(jsonPath("$[1].productId").exists())
-        .andExpect(jsonPath("$[1].name").exists())
-        .andExpect(jsonPath("$[1].unit").exists());
+        .andExpect(jsonPath("$[1].productId").value(EXPECTED_ID_2))
+        .andExpect(jsonPath("$[1].name").value(EXPECTED_NAME_2))
+        .andExpect(jsonPath("$[1].unit").value(CURRENT_PRODUCT_STOCK_2));
     }
     @Test
-    @DisplayName("Integration - Must return status 200 and empty body")
+    @DisplayName("Integration - verifyStocks - Must return status 200 and empty body")
     void verifyStocksTest02() throws IOException, Exception {
         // arrange
         List<ProductIdAndUnitsDTO> requestBody = 
             List.of(new ProductIdAndUnitsDTO(1L, 1), new ProductIdAndUnitsDTO(2L, 1));
         
         // act
-        mvc.perform(post("/products/stocks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -201,7 +206,7 @@ class ProductControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Must return status 201 and product data that correspond to the specifications")
+    @DisplayName("Integration - readAllBySpecs - Must return status 201 and product data that correspond to the specifications")
     void readAllBySpecsTest01() throws IOException, Exception {
         // arrange
         Product productExpected = this.productsPersisted.get(0);
@@ -217,9 +222,10 @@ class ProductControllerIntegrationTest {
         List<Map<String, String>> input = List.of(Map.of("attribute", "cores", "value", "12"));
         
         // act
-        mvc.perform(post("/products/specs")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(specsJson.write(input).getJson())
+        mvc.perform(
+            post("/products/specs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(specsJson.write(input).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -236,7 +242,7 @@ class ProductControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - Must return status 200 and product prices")
+    @DisplayName("Integration - getPrices - Must return status 200 and product prices")
     void getPricesTest01() throws IOException, Exception {
         // arrange
         var ID_PRODUCT_1 = productsPersisted.get(0).getId();
@@ -248,9 +254,10 @@ class ProductControllerIntegrationTest {
         var requestBody = List.of(ID_PRODUCT_1, ID_PRODUCT_2);
         
         // act
-        mvc.perform(post("/products/prices")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(idsListJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products/prices")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(idsListJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -265,7 +272,7 @@ class ProductControllerIntegrationTest {
     }
     
     @Test
-    @DisplayName("Integration - Must return status 200 and product data updated")
+    @DisplayName("Integration - updateProduct - Must return status 200 and product data updated")
     void updateProductTest01() throws IOException, Exception {
         // assert
         Long ID = 1L;
@@ -284,9 +291,10 @@ class ProductControllerIntegrationTest {
         );
         
         // act
-        mvc.perform(put("/products/" + ID)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(productUpdateDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            put("/products/" + ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productUpdateDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -298,7 +306,7 @@ class ProductControllerIntegrationTest {
         .andExpect(jsonPath("$.manufacturer.name").value(EXPECTED_MANUFACTURER_NAME));
     }
     @Test
-    @DisplayName("Integration - Must reduce stock and return status 200")
+    @DisplayName("Integration - updateStock - Must reduce stock and return status 200")
     void updateStockTest01() throws IOException, Exception {
         // arrange
         StockDTO requestBody = new StockDTO(2);
@@ -309,9 +317,10 @@ class ProductControllerIntegrationTest {
         var EXPECTED_UNITS = ORIGINAL_STOCK + requestBody.getUnit();
         
         // act
-        mvc.perform(put("/products/1/stocks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(stockDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            put("/products/1/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(stockDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -320,7 +329,7 @@ class ProductControllerIntegrationTest {
         .andExpect(jsonPath("$.unit").value(EXPECTED_UNITS));
     }
     @Test
-    @DisplayName("Integration - Must increase stock and return status 200")
+    @DisplayName("Integration - updateStock - Must increase stock and return status 200")
     void updateStockTest02() throws IOException, Exception {
         // arrange
         StockDTO requestBody = new StockDTO(2);
@@ -331,14 +340,30 @@ class ProductControllerIntegrationTest {
         var EXPECTED_UNITS = ORIGINAL_STOCK + requestBody.getUnit();
         
         // act
-        mvc.perform(put("/products/1/stocks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(stockDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            put("/products/1/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(stockDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.productId").value(productId))
         .andExpect(jsonPath("$.name").value(EXPECTED_PRODUCT_NAME))
         .andExpect(jsonPath("$.unit").value(EXPECTED_UNITS));
+    }
+
+    Product createProduct(Manufacturer manufacturer, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
+        ProductSpec spec = new ProductSpec(specAttribute, specValue);
+        Product product = Product.builder()
+            .name(name)
+            .description(description)
+            .price(price)
+            .category(category)
+            .stock(new Stock(stockUnits))
+            .manufacturer(manufacturer)
+            .specs(List.of(spec))
+            .build();
+        spec.setProduct(product);
+        return product;
     }
 }

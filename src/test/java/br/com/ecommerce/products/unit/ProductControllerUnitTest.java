@@ -97,21 +97,13 @@ class ProductControllerUnitTest {
         when(service.createProduct(any())).thenReturn(responseBody);
         
         // act
-        mvc.perform(post("/products")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(productDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isCreated())
-        .andExpect( result -> {
-            String redirect = result.getResponse().getRedirectedUrl();
-            var nullableRedicrect = Optional.ofNullable(redirect);
-
-            redirect = nullableRedicrect
-                .orElseThrow(() -> new AssertionError("Redirect URL is null"));
-            if (redirect.isBlank())
-                throw new AssertionError("Redirect URL is blank");
-        })
         .andExpect(jsonPath("$.id").exists())
         .andExpect(jsonPath("$.name").value(requestBody.getName()))
         .andExpect(jsonPath("$.description").value(requestBody.getDescription()))
@@ -120,7 +112,16 @@ class ProductControllerUnitTest {
         .andExpect(jsonPath("$.stock.unit").value(requestBody.getStock().getUnit().toString()))
         .andExpect(jsonPath("$.manufacturer.name").value(requestBody.getManufacturer().getName()))
         .andExpect(jsonPath("$.specs[0].attribute").value(requestBody.getSpecs().get(0).getAttribute()))
-        .andExpect(jsonPath("$.specs[0].value").value(requestBody.getSpecs().get(0).getValue()));
+        .andExpect(jsonPath("$.specs[0].value").value(requestBody.getSpecs().get(0).getValue()))
+        .andExpect( result -> {
+            String redirect = result.getResponse().getRedirectedUrl();
+            var nullableRedicrect = Optional.ofNullable(redirect);
+
+            redirect = nullableRedicrect
+                .orElseThrow(() -> new AssertionError("Redirect URL is null"));
+            if (redirect.isBlank())
+                throw new AssertionError("Redirect URL is blank");
+        });
 
         verify(service).createProduct(any());
     }
@@ -138,9 +139,10 @@ class ProductControllerUnitTest {
             null);
         
         // act
-        mvc.perform(post("/products")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(productDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isBadRequest());
@@ -161,9 +163,10 @@ class ProductControllerUnitTest {
         when(service.verifyProductsStocks(anyList())).thenReturn(serviceReturnMock);
         
         // act
-        mvc.perform(post("/products/stocks")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isMultiStatus())
@@ -191,9 +194,10 @@ class ProductControllerUnitTest {
         when(service.verifyProductsStocks(anyList())).thenReturn(emptyList);
         
         // act
-        mvc.perform(post("/products/stocks")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productIdAndUnitsDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -208,9 +212,10 @@ class ProductControllerUnitTest {
         List<ProductIdAndUnitsDTO> emptyRequestBody = List.of();
 
         // act
-        mvc.perform(post("/products/stocks")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(productIdAndUnitsDTOJson.write(emptyRequestBody).getJson())
+        mvc.perform(
+            post("/products/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productIdAndUnitsDTOJson.write(emptyRequestBody).getJson())
         )
         // assert
         .andExpect(status().isBadRequest());
@@ -238,9 +243,10 @@ class ProductControllerUnitTest {
             .thenReturn(new PageImpl<>(List.of(new ProductResponseDTO(productExpected))));
 
         // act
-        mvc.perform(post("/products/specs")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(specsJson.write(input).getJson())
+        mvc.perform(
+            post("/products/specs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(specsJson.write(input).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -264,9 +270,10 @@ class ProductControllerUnitTest {
         List<Map<String, String>> requestBodyEmptyList = List.of();
 
         // act
-        mvc.perform(post("/products/specs")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(specsJson.write(requestBodyEmptyList).getJson())
+        mvc.perform(
+            post("/products/specs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(specsJson.write(requestBodyEmptyList).getJson())
         )
         // assert
         .andExpect(status().isBadRequest());
@@ -284,9 +291,10 @@ class ProductControllerUnitTest {
         when(service.getAllProductsByListOfIds(anyList())).thenReturn(serviceReturnMock);
         
         // act
-        mvc.perform(post("/products/prices")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(idListJson.write(requestBody).getJson())
+        mvc.perform(
+            post("/products/prices")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(idListJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -302,9 +310,10 @@ class ProductControllerUnitTest {
         List<Long> requestBodyEmptyList = List.of();
         
         // act
-        mvc.perform(post("/products/prices")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(idListJson.write(requestBodyEmptyList).getJson())
+        mvc.perform(
+            post("/products/prices")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(idListJson.write(requestBodyEmptyList).getJson())
         )
         // assert
         .andExpect(status().isBadRequest());
@@ -341,9 +350,10 @@ class ProductControllerUnitTest {
         var EXPECTED_MANUFACTURER_NAME = requestBody.getManufacturer().getName();
 
         // act
-        mvc.perform(put("/products/1")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(productUpdateDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            put("/products/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productUpdateDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -357,7 +367,7 @@ class ProductControllerUnitTest {
     }
     
     @Test
-    @DisplayName("Unit - updateStock - Must return statos 200 and stock data")
+    @DisplayName("Unit - updateStock - Must return status 200 and stock data")
     void updateStockTest01() throws IOException, Exception {
         // arrange
         StockDTO requestBody = new StockDTO(2);
@@ -369,9 +379,10 @@ class ProductControllerUnitTest {
         var EXPECTED_UNIT = serviceReturnMock.getUnit();
         
         // act
-        mvc.perform(put("/products/1/stocks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(stockDTOJson.write(requestBody).getJson())
+        mvc.perform(
+            put("/products/1/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(stockDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isOk())
@@ -380,5 +391,23 @@ class ProductControllerUnitTest {
         .andExpect(jsonPath("$.unit").value(EXPECTED_UNIT));
 
         verify(service).updateStockByProductId(anyLong(), any());
+    }
+    @Test
+    @DisplayName("Unit - updateStock - Must return status 400 when request body is invalid")
+    void updateStockTest02() throws IOException, Exception {
+        // arrange
+        StockDTO emptyRequestBody = new StockDTO();
+        
+        // act
+        mvc.perform(
+            put("/products/1/stocks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(stockDTOJson.write(emptyRequestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.fields.unit").exists());
+
+        verifyNoInteractions(service);
     }
 }

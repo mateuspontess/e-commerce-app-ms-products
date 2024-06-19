@@ -33,14 +33,14 @@ class ManufacturerServiceUnitTest {
     private ManufacturerService service;
 
     @Test
-    @DisplayName("Unit - getAllManufacturers - Must return all Manufacturers")
-    void getAllManufacturersTest01() {
+    @DisplayName("Unit - findAllManufacturers - Must return all Manufacturers")
+    void findAllManufacturersTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
         when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(manufacturer)));
         
         // act
-        ManufacturerResponseDTO result = service.getAll(PageRequest.of(0, 10))
+        ManufacturerResponseDTO result = service.findAllManufacturers(PageRequest.of(0, 10))
             .getContent()
             .get(0);
 
@@ -50,14 +50,14 @@ class ManufacturerServiceUnitTest {
 	}
 
     @Test
-    @DisplayName("Unit - getManufacturerById - Must return manufacturer by ID")
-    void getManufacturerByIdTest01() {
+    @DisplayName("Unit - findManufacturerById - Must return manufacturer by ID")
+    void findManufacturerByIdTest01() {
         // arrange
         Manufacturer manufacturer = new Manufacturer("AMD");
         when(repository.findById(any())).thenReturn(Optional.of(manufacturer));
         
         // act
-        ManufacturerResponseDTO result = service.getById(1L);
+        ManufacturerResponseDTO result = service.findManufacturerById(1L);
 
         // assert
 		assertNotNull(result);

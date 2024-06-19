@@ -59,28 +59,32 @@ class ManufacturerControllerIntegrationTest {
         String MANUFACTURER_NAME = "AMD";
         ManufacturerDTO requestBody = new ManufacturerDTO(MANUFACTURER_NAME);
 
-        // act and assert
+        // act
         mvc.perform(
             post("/manufacturers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(MANUFACTURER_NAME));
+                .content(manufacturerDTOJson.write(requestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(1L))
+        .andExpect(jsonPath("$.name").value(MANUFACTURER_NAME));
     }
     @Test
-    @DisplayName("Integration - createManufacturer - Should return status 400 and field error")
+    @DisplayName("Integration - createManufacturer - Should return status 400 when request body is invalid")
     void createManufacturerTest01Test02() throws IOException, Exception {
         // arrange
-        ManufacturerDTO requestBody = new ManufacturerDTO("");
+        ManufacturerDTO invalidRequestBody = new ManufacturerDTO("");
 
-        // act and assert
+        // act 
         mvc.perform(
             post("/manufacturers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+                .content(manufacturerDTOJson.write(invalidRequestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.fields.name").exists());
     }
 
     @Test
@@ -90,16 +94,18 @@ class ManufacturerControllerIntegrationTest {
         var manufacturers = List.of(new Manufacturer("AMD"), new Manufacturer("INTEL"), new Manufacturer("NVIDIA"));
         repository.saveAll(manufacturers);
         
-        // act and assert
+        // act
         mvc.perform(
             get("/manufacturers")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content").isArray())
-            .andExpect(jsonPath("$.content", hasSize(3)))
-            .andExpect(jsonPath("$.content[0].name").value(manufacturers.get(0).getName()))
-            .andExpect(jsonPath("$.content[1].name").value(manufacturers.get(1).getName()))
-            .andExpect(jsonPath("$.content[2].name").value(manufacturers.get(2).getName()));
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+        // assert
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content").isArray())
+        .andExpect(jsonPath("$.content", hasSize(3)))
+        .andExpect(jsonPath("$.content[0].name").value(manufacturers.get(0).getName()))
+        .andExpect(jsonPath("$.content[1].name").value(manufacturers.get(1).getName()))
+        .andExpect(jsonPath("$.content[2].name").value(manufacturers.get(2).getName()));
     }
 
     @Test
@@ -108,11 +114,13 @@ class ManufacturerControllerIntegrationTest {
         // arrange
         repository.save(new Manufacturer("MSI"));
 
-        // act and assert
+        // act
         mvc.perform(
             get("/manufacturers/1")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+        // assert
+        .andExpect(status().isOk());
     }
 
     @Test
@@ -122,28 +130,32 @@ class ManufacturerControllerIntegrationTest {
         repository.save(new Manufacturer("Micro Start International"));
         var requestBody = new ManufacturerDTO("MSI");
 
-        // act and assert
+        // act
         mvc.perform(
             put("/manufacturers/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value("1"))
-            .andExpect(jsonPath("$.name").value(requestBody.getName()));
+                .content(manufacturerDTOJson.write(requestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value("1"))
+        .andExpect(jsonPath("$.name").value(requestBody.getName()));
     }
     @Test
-    @DisplayName("Integration - updateManufacturer - Should return status 400 and field error")
+    @DisplayName("Integration - updateManufacturer - Should return status 400 when request body is invalid")
     void updateManufacturerTest02() throws IOException, Exception {
         // arrange
         repository.save(new Manufacturer("Micro Star International"));
-        var requestBody = new ManufacturerDTO("");
+        var invalidRequestBody = new ManufacturerDTO("");
 
-        // act and assert
+        // act
         mvc.perform(
             put("/manufacturers/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson()))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+                .content(manufacturerDTOJson.write(invalidRequestBody).getJson())
+        )
+        // assert
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.fields.name").exists());
     }
 }

@@ -37,33 +37,33 @@ class ManufacturerServiceIntegrationTest {
 
 
     @Test
-    @DisplayName("Integration - getAll - Must return a list of ManufacturerResponseDTO")
-    void getAllTest01() {
+    @DisplayName("Integration - findAllManufacturers - Must return a list of ManufacturerResponseDTO")
+    void findAllManufacturersTest01() {
         // arrange
-        var persistedNames = repository.saveAll(List.of(new Manufacturer("Corsair"), new Manufacturer("Logitech"), new Manufacturer("Redragon")))
-                .stream()
-                    .map(m -> m.getName())
-                    .toList();
+        var persistedNames = repository.saveAll(
+            List.of(new Manufacturer("Corsair"), new Manufacturer("Logitech"), new Manufacturer("Redragon")))
+            .stream()
+                .map(m -> m.getName())
+                .toList();
 
         // act
-        List<String> resultNames = service.getAll(PageRequest.of(0, 10))
-            .getContent()
-            .stream()
-            .map(result -> result.getName())
-            .toList();
+        List<String> resultNames = 
+            service.findAllManufacturers(PageRequest.of(0, 10)).getContent().stream()
+                .map(result -> result.getName())
+                .toList();
 
         // assert
         assertTrue(persistedNames.containsAll(resultNames));
     }
 
     @Test
-    @DisplayName("Integration - getById - Must return a ManufacturerResponseDTO")
-    void getByIdTest01() {
+    @DisplayName("Integration - findManufacturerById - Must return a ManufacturerResponseDTO")
+    void findManufacturerByIdTest01() {
         // arrange
         var persisted = repository.save(new Manufacturer("Corsair"));
 
         // act
-        ManufacturerResponseDTO result = service.getById(1L);
+        ManufacturerResponseDTO result = service.findManufacturerById(1L);
 
         // assert
         assertEquals(persisted.getName(), result.getName());
