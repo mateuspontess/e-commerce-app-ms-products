@@ -38,12 +38,12 @@ public class ManufacturerController {
 
 	@GetMapping
 	public ResponseEntity<Page<ManufacturerResponseDTO>> getAllManufacturers(@PageableDefault(size = 10) Pageable pageable){
-		Page<ManufacturerResponseDTO> dto = service.getAll(pageable);
+		Page<ManufacturerResponseDTO> dto = service.findAllManufacturers(pageable);
 		return ResponseEntity.ok(dto);
 	}
 	@GetMapping("/{id}")
 	public ResponseEntity<ManufacturerResponseDTO> getManufacturerById(@PathVariable Long id){
-		return ResponseEntity.ok(service.getById(id));
+		return ResponseEntity.ok(service.findManufacturerById(id));
 	}
 	
 	@PutMapping("/{id}")

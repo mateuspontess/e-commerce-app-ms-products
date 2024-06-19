@@ -18,15 +18,15 @@ public class ManufacturerService {
 	private ManufacturerRepository repository;
 	
 	
-	public Page<ManufacturerResponseDTO> getAll(Pageable pageable){
+	public Page<ManufacturerResponseDTO> findAllManufacturers(Pageable pageable){
 		return repository
-				.findAll(pageable)
-				.map(ManufacturerResponseDTO::new);
+			.findAll(pageable)
+			.map(ManufacturerResponseDTO::new);
 	}
 	
-	public ManufacturerResponseDTO getById(Long id){
+	public ManufacturerResponseDTO findManufacturerById(Long id){
 		Manufacturer mf = repository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(EntityNotFoundException::new);
 		return new ManufacturerResponseDTO(mf);
 	}
 	
