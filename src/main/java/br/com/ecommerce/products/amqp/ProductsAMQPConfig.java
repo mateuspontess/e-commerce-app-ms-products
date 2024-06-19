@@ -25,7 +25,7 @@ public class ProductsAMQPConfig {
 		return new RabbitAdmin(conn);
 	}
 	@Bean
-	ApplicationListener<ApplicationReadyEvent> inicializaRabbitadmin(RabbitAdmin admin) {
+	ApplicationListener<ApplicationReadyEvent> initializeRabbitadmin(RabbitAdmin admin) {
 		return event -> admin.initialize();
 	}
 	@Bean
@@ -33,7 +33,7 @@ public class ProductsAMQPConfig {
 		return new Jackson2JsonMessageConverter();
 	}
 	@Bean
-	RabbitTemplate criaTemplate(ConnectionFactory conn, Jackson2JsonMessageConverter messageConverter){
+	RabbitTemplate createTemplate(ConnectionFactory conn, Jackson2JsonMessageConverter messageConverter){
 		RabbitTemplate template = new RabbitTemplate(conn);
 		template.setMessageConverter(messageConverter);
 		
@@ -43,19 +43,19 @@ public class ProductsAMQPConfig {
 	// Receiver configs
 	static class Receiver {
 		@Bean
-		DirectExchange discoverExchangePedidos() {
+		DirectExchange discoverExchangeOrders() {
 			return ExchangeBuilder.directExchange("orders.create.ex").build();
 		}
 		@Bean
-		Queue filaStockProdutos() {
+		Queue queueStockProducts() {
 			return QueueBuilder.nonDurable("products.stock-orders").build();
 		}
 		@Bean
-		Binding bindPedidos() {
+		Binding bindOrders() {
 			return BindingBuilder
-					.bind(this.filaStockProdutos())
-					.to(this.discoverExchangePedidos())
-					.with("stock");
+				.bind(this.queueStockProducts())
+				.to(this.discoverExchangeOrders())
+				.with("stock");
 		}
 	}
 }
