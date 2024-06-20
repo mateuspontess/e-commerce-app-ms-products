@@ -32,10 +32,11 @@ public class RandomUtils {
         spec.setProduct(product);
         return product;
     }
-    static Product getRandomProduct(long id) {
+
+    public static Product getRandomProduct(boolean withId) {
         return createProduct(
             new Manufacturer(getRandomString()),
-            id,
+            randomIdOrNull(withId),
             getRandomString(), 
             getRandomString(), 
             getRandomBigDecimal(), 
@@ -45,17 +46,31 @@ public class RandomUtils {
             getRandomString()
         );
     }
-    public static Product getRandomProduct() {
-        return getRandomProduct((long) getRandomInt());
-    }
-    public static List<Product> getListOfRandomProducts(long bound) {
+    public static List<Product> getListOfRandomProducts(long bound, boolean withId) {
         List<Product> products = new ArrayList<>();
         for (long i = 0; i < bound; i++) {
-            products.add(getRandomProduct(i));
+            products.add(getRandomProduct(withId));
         }
         return products;
     }
 
+    public static Manufacturer getRandomManufacturer() {
+        return new Manufacturer(getRandomString());
+    }
+    public static List<Manufacturer> getListOfRandomManufacturers(int bound) {
+        List<Manufacturer> manufacturers = new ArrayList<>();
+        for (long i = 0; i < bound; i++) {
+            manufacturers.add(getRandomManufacturer());
+        }
+        return manufacturers;
+    }
+
+    static Long randomIdOrNull(boolean withId) {
+        if (withId) {
+            return (long) getRandomInt();
+        }
+        return null;
+    }
     static int getRandomInt() {
         return random.nextInt(100);
     }
