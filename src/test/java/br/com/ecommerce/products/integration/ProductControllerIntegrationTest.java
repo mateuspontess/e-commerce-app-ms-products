@@ -92,7 +92,7 @@ class ProductControllerIntegrationTest {
     @DisplayName("Integration - createProduct - Must return status 201 and product data")
         void createProductTest01() throws IOException, Exception {
         // arrange
-        ProductDTO input = new ProductDTO(
+        ProductDTO requestBody = new ProductDTO(
             "name",
             "description",
             BigDecimal.valueOf(999.99),
@@ -104,25 +104,25 @@ class ProductControllerIntegrationTest {
         mvc.perform(
             post("/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(productDTOJson.write(input).getJson())
+                .content(productDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").exists())
-        .andExpect(jsonPath("$.name").value(input.getName()))
-        .andExpect(jsonPath("$.description").value(input.getDescription()))
-        .andExpect(jsonPath("$.price").value(input.getPrice()))
-        .andExpect(jsonPath("$.category").value(input.getCategory().toString()))
-        .andExpect(jsonPath("$.stock.unit").value(input.getStock().getUnit().toString()))
-        .andExpect(jsonPath("$.manufacturer.name").value(input.getManufacturer().getName()))
-        .andExpect(jsonPath("$.specs[0].attribute").value(input.getSpecs().get(0).getAttribute()))
-        .andExpect(jsonPath("$.specs[0].value").value(input.getSpecs().get(0).getValue()));
+        .andExpect(jsonPath("$.name").value(requestBody.getName()))
+        .andExpect(jsonPath("$.description").value(requestBody.getDescription()))
+        .andExpect(jsonPath("$.price").value(requestBody.getPrice()))
+        .andExpect(jsonPath("$.category").value(requestBody.getCategory().toString()))
+        .andExpect(jsonPath("$.stock.unit").value(requestBody.getStock().getUnit().toString()))
+        .andExpect(jsonPath("$.manufacturer.name").value(requestBody.getManufacturer().getName()))
+        .andExpect(jsonPath("$.specs[0].attribute").value(requestBody.getSpecs().get(0).getAttribute()))
+        .andExpect(jsonPath("$.specs[0].value").value(requestBody.getSpecs().get(0).getValue()));
     }
     @Test
     @DisplayName("Integration - createProduct - Must return status 400")
     void createProductTest02() throws IOException, Exception {
         // arrange
-        ProductDTO input = new ProductDTO(
+        ProductDTO requestBody = new ProductDTO(
             "",
             "",
             null,
@@ -135,7 +135,7 @@ class ProductControllerIntegrationTest {
         mvc.perform(
             post("/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(productDTOJson.write(input).getJson())
+                .content(productDTOJson.write(requestBody).getJson())
         )
         // assert
         .andExpect(jsonPath("$.fields.name").exists())

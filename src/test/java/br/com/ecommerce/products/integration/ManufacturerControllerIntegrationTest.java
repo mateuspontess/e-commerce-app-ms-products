@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,8 +93,7 @@ class ManufacturerControllerIntegrationTest {
     @DisplayName("Integration - getAllManufacturers - Should return status 200 and expected response body")
     void getAllManufacturersTest01() throws IOException, Exception {
         // arrange
-        var manufacturers = List.of(new Manufacturer("AMD"), new Manufacturer("INTEL"), new Manufacturer("NVIDIA"));
-        repository.saveAll(manufacturers);
+        var manufacturers = this.saveManufacturers("AMD", "INTEL", "NVIDIA");
         
         // act
         mvc.perform(
@@ -112,7 +113,7 @@ class ManufacturerControllerIntegrationTest {
     @DisplayName("Integration - getManufacturerById - Should return status 200 and expected response body")
     void getManufacturerById() throws IOException, Exception {
         // arrange
-        repository.save(new Manufacturer("MSI"));
+        this.saveManufacturer("MSI");
 
         // act
         mvc.perform(
@@ -127,7 +128,7 @@ class ManufacturerControllerIntegrationTest {
     @DisplayName("Integration - updateManufacturer - Should return status 200 and expected response body")
     void updateManufacturerTest01() throws IOException, Exception {
         // arrange
-        repository.save(new Manufacturer("Micro Start International"));
+        this.saveManufacturer("Micro Start International");
         var requestBody = new ManufacturerDTO("MSI");
 
         // act
@@ -145,7 +146,7 @@ class ManufacturerControllerIntegrationTest {
     @DisplayName("Integration - updateManufacturer - Should return status 400 when request body is invalid")
     void updateManufacturerTest02() throws IOException, Exception {
         // arrange
-        repository.save(new Manufacturer("Micro Star International"));
+        this.saveManufacturer("Micro Start International");
         var invalidRequestBody = new ManufacturerDTO("");
 
         // act
@@ -157,5 +158,16 @@ class ManufacturerControllerIntegrationTest {
         // assert
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.fields.name").exists());
+    }
+
+    private List<Manufacturer> saveManufacturers(String ... names) {
+        return this.repository.saveAll(
+            Stream.of(names)
+                .map(name -> new Manufacturer((String) name))
+                .collect(Collectors.toList())
+        );
+    }
+    private Manufacturer saveManufacturer(String name) {
+        return this.repository.save(new Manufacturer(name));
     }
 }
