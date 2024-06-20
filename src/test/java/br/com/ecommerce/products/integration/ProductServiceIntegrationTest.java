@@ -40,11 +40,11 @@ import br.com.ecommerce.products.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
+@Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 class ProductServiceIntegrationTest {
 
     @Autowired
@@ -63,7 +63,7 @@ class ProductServiceIntegrationTest {
         manufacturersPersisted = manufacturerRepository.saveAll(
             List.of(new Manufacturer("AMD"), new Manufacturer("INTEL"))
         );
-
+        
         Product p1 = createProduct(manufacturersPersisted.get(0), "aaa", "ddd", BigDecimal.valueOf(1000), Category.CPU, 1000, "cores", "12");
         Product p2 = createProduct(manufacturersPersisted.get(0), "bbb", "ddd", BigDecimal.valueOf(100), Category.CPU, 100, "cores", "8");
         Product p3 = createProduct(manufacturersPersisted.get(1), "ccc", "ddd", BigDecimal.TEN, Category.GPU, 10, "memory size", "8GB");
