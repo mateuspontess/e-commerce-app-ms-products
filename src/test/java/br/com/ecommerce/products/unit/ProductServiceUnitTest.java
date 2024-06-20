@@ -33,7 +33,6 @@ import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
 import br.com.ecommerce.products.model.product.ProductResponseDTO;
-import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductSpecDTO;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;
 import br.com.ecommerce.products.model.product.Stock;
@@ -55,7 +54,7 @@ class ProductServiceUnitTest {
     @InjectMocks
     private ProductService service;
 
-    private final Product testProductDefault = RandomUtils.getRandomProduct();
+    private final Product testProductDefault = RandomUtils.getRandomProduct(true);
 
     @BeforeEach
     void setup() {
@@ -68,7 +67,6 @@ class ProductServiceUnitTest {
     void getProductTest01() {
         // arrange
         Product product = this.testProductDefault;
-
         when(repository.findById(anyLong())).thenReturn(Optional.of(product));
         
         // act
@@ -118,16 +116,7 @@ class ProductServiceUnitTest {
     @DisplayName("Unit - getAllBySpecs - Must return all products by specifications")
     void getAllBySpecsTest01() {
         // arrange
-        Product product = Product.builder()
-            .id(1L)
-            .name("Product-san")
-            .description("Description-san")
-            .price(BigDecimal.TEN)
-            .category(Category.CPU)
-            .stock(new Stock(200))
-            .manufacturer(new Manufacturer("AMD"))
-            .specs(List.of(new ProductSpec()))
-            .build();
+        Product product = RandomUtils.getRandomProduct(true);
 
         when(repository.findProductsBySpecs(any(), any()))
             .thenReturn(new PageImpl<Product>(List.of(product)));

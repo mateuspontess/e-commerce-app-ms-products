@@ -159,7 +159,7 @@ class ProductControllerUnitTest {
             new ProductIdAndUnitsDTO(2L, 1)
         );
 
-        List<Product> serviceReturnMock = RandomUtils.getListOfRandomProducts(2);
+        List<Product> serviceReturnMock = RandomUtils.getListOfRandomProducts(2, true);
         when(service.verifyProductsStocks(anyList())).thenReturn(serviceReturnMock);
         
         // act
@@ -227,7 +227,7 @@ class ProductControllerUnitTest {
     @DisplayName("Unit - readAllBySpecs - Must return status 201 and product data")
     void readAllBySpecsTest01() throws IOException, Exception {
         // arrange
-        Product productExpected = RandomUtils.getRandomProduct();
+        Product productExpected = RandomUtils.getRandomProduct(true);
         var EXPECTED_ID = productExpected.getId();
         var EXPECTED_NAME = productExpected.getName();
         var EXPECTED_DESCRIPTION = productExpected.getDescription();
@@ -287,7 +287,7 @@ class ProductControllerUnitTest {
         // arrange
         var requestBody = List.of(1L, 2L);
 
-        List<Product> serviceReturnMock = RandomUtils.getListOfRandomProducts(requestBody.size());
+        List<Product> serviceReturnMock = RandomUtils.getListOfRandomProducts(requestBody.size(), true);
         when(service.getAllProductsByListOfIds(anyList())).thenReturn(serviceReturnMock);
         
         // act

@@ -24,6 +24,7 @@ import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.service.ManufacturerService;
+import br.com.ecommerce.products.utils.RandomUtils;
 import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +39,7 @@ class ManufacturerServiceUnitTest {
     @DisplayName("Unit - findAllManufacturers - Must return all Manufacturers")
     void findAllManufacturersTest01() {
         // arrange
-        Manufacturer manufacturer = new Manufacturer("AMD");
+        Manufacturer manufacturer = RandomUtils.getRandomManufacturer();
         when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(manufacturer)));
         
         // act
@@ -55,7 +56,7 @@ class ManufacturerServiceUnitTest {
     @DisplayName("Unit - findManufacturerById - Must return manufacturer by ID")
     void findManufacturerByIdTest01() {
         // arrange
-        Manufacturer manufacturer = new Manufacturer("AMD");
+        Manufacturer manufacturer = RandomUtils.getRandomManufacturer();
         when(repository.findById(any())).thenReturn(Optional.of(manufacturer));
         
         // act
@@ -89,7 +90,7 @@ class ManufacturerServiceUnitTest {
     @DisplayName("Unit - updateManufacturerData - Must update manufacturer")
     void updateManufacturerDataTest01() {
         // arrange
-        Manufacturer target = new Manufacturer("AMD");
+        Manufacturer target = RandomUtils.getRandomManufacturer();
         ManufacturerDTO requestBody = new ManufacturerDTO("INTEL");
         when(repository.findById(any())).thenReturn(Optional.of(target));
         
