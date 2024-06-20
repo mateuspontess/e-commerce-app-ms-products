@@ -1,4 +1,4 @@
-package br.com.ecommerce.products.configs;
+package br.com.ecommerce.products.testcontainers;
 
 import javax.sql.DataSource;
 
