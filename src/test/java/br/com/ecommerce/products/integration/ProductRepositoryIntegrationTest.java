@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import br.com.ecommerce.products.configs.MySQLTestContainerConfig;
 import br.com.ecommerce.products.model.manufacturer.Manufacturer;
 import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
@@ -26,6 +25,7 @@ import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.Stock;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.repository.ProductRepository;
+import br.com.ecommerce.products.testcontainers.MySQLTestContainerConfig;
 
 @DataJpaTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
