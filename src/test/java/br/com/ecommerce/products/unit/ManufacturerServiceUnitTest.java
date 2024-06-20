@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.unit;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +24,7 @@ import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.service.ManufacturerService;
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ManufacturerServiceUnitTest {
@@ -63,6 +65,11 @@ class ManufacturerServiceUnitTest {
 		assertNotNull(result);
 		assertEquals(manufacturer.getName(), result.getName());
 	}
+    @Test
+    @DisplayName("Unit - findManufacturerById - Should throw exception when not finding manufacturer")
+    void findManufacturerByIdTest02() {
+        assertThrows(EntityNotFoundException.class, () -> service.findManufacturerById(1L));
+	}
 
     @Test
     @DisplayName("Unit - saveManufacturer - Must save manufacturer")
@@ -90,5 +97,12 @@ class ManufacturerServiceUnitTest {
         service.updateManufacturerData(1L, requestBody);
 
         assertEquals(requestBody.getName(), target.getName());
+	}
+    @Test
+    @DisplayName("Unit - updateManufacturerData - Should throw exception when not finding manufacturer")
+    void updateManufacturerDataTest02() {
+        // arrange
+        assertThrows(EntityNotFoundException.class, 
+        () -> service.updateManufacturerData(1L, new ManufacturerDTO("AMD")));
 	}
 }

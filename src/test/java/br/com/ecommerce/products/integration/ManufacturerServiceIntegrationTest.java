@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.integration;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,6 +22,7 @@ import br.com.ecommerce.products.model.manufacturer.ManufacturerDTO;
 import br.com.ecommerce.products.model.manufacturer.ManufacturerResponseDTO;
 import br.com.ecommerce.products.repository.ManufacturerRepository;
 import br.com.ecommerce.products.service.ManufacturerService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest
@@ -68,6 +70,11 @@ class ManufacturerServiceIntegrationTest {
         // assert
         assertEquals(persisted.getName(), result.getName());
     }
+    @Test
+    @DisplayName("Integration - findManufacturerById - Should throw exception when not finding manufacturer")
+    void findManufacturerByIdTest02() {
+        assertThrows(EntityNotFoundException.class, () -> service.findManufacturerById(1000L));
+    }
 
     @Test
     @DisplayName("Integration - saveManufacturer - Must return a ManufacturerResponseDTO")
@@ -92,5 +99,10 @@ class ManufacturerServiceIntegrationTest {
 
         // assert
         assertEquals(NEW_NAME.toUpperCase(), updated.getName());
+    }
+    @Test
+    @DisplayName("Integration - updateManufacturerData - Should throw exception when not finding manufacturer")
+    void updateManufacturerDataTest02() {
+        assertThrows(EntityNotFoundException.class, () -> service.updateManufacturerData(1000L, new ManufacturerDTO("non-existent")));
     }
 }

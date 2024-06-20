@@ -190,8 +190,8 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    @DisplayName("Unit - updateProduct - Update product with full data")
-    void updateProductTest01() {
+    @DisplayName("Unit - updateProductData - Update product with full data")
+    void updateProductDataTest01() {
         // arrange
         Product target = this.testProductDefault;
         
@@ -213,14 +213,13 @@ class ProductServiceUnitTest {
         assertEquals(requestBody.getManufacturer().getName(), target.getManufacturer().getName());
     }
     @Test
-    @DisplayName("Unit - updateProduct - Must update product without a new manufacturer")
-    void updateProductTest02() {
+    @DisplayName("Unit - updateProductData - Must update product without a new manufacturer")
+    void updateProductDataTest02() {
         // arrange
         Product target = this.testProductDefault;
 
         ProductUpdateDTO requestBody = 
             new ProductUpdateDTO("UPDATE-NAME", "UPDATE-DESCRIPTION", BigDecimal.ONE, Category.FAN, null);
-
         when(repository.getReferenceById(any())).thenReturn(target);
         
         // act
@@ -231,6 +230,19 @@ class ProductServiceUnitTest {
         assertEquals(requestBody.getDescription(), target.getDescription());
         assertEquals(requestBody.getPrice(), target.getPrice());
         assertEquals(requestBody.getCategory(), target.getCategory());
+    }
+    @Test
+    @DisplayName("Unit - updateProductData - Should fail when trying to update to a manufacturer that does not yet exist")
+    void updateProductDataTest03() {
+        // arrange
+        Product target = this.testProductDefault;
+
+        ProductUpdateDTO input = 
+            new ProductUpdateDTO(null, null, null, null, new ManufacturerDTO("non-existent"));
+        when(repository.getReferenceById(any())).thenReturn(target);
+        
+        // act
+        assertThrows(EntityNotFoundException.class, () -> service.updateProductData(1L, input));
     }
 
     @Test
