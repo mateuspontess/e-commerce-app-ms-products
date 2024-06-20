@@ -23,20 +23,39 @@ public class StockUnitTest {
     }
 
     @Test
-    void updateStockTest01() {
-        Stock stock1 = new Stock(2);
-        stock1.update(-1);
-        var result1 = stock1.getUnit();
-        assertEquals(1, result1);
-        
-        Stock stock2 = new Stock(2);
-        stock2.update(-2);
-        var result2 = stock2.getUnit();
-        assertEquals(0, result2);
-        
-        Stock stock3 = new Stock(2);
-        stock3.update(-1000);
-        var result3 = stock3.getUnit();
-        assertEquals(0, result3);
+    void updateStock_withNegativeOne_shouldHaveOneUnitLeft() {
+        // arran
+        Stock stock = new Stock(2);
+
+        // act
+        stock.update(-1);
+
+        // assert
+        int remainingUnits = stock.getUnit();
+        assertEquals(1, remainingUnits, "Stock should be updated to 1 unit");
+    }
+    @Test
+    void updateStock_withNegativeTwo_shouldHaveZeroUnitsLeft() {
+        // arrange
+        Stock stock = new Stock(2);
+
+        // act
+        stock.update(-2);
+
+        // assert
+        int remainingUnits = stock.getUnit();
+        assertEquals(0, remainingUnits, "Stock should be updated to 0 units");
+    }
+    @Test
+    void updateStock_withExcessivelyNegativeValue_shouldHaveZeroUnitsLeft() {
+        // arrange
+        Stock stock = new Stock(2);
+
+        // act
+        stock.update(-1000);
+
+        // assert
+        int remainingUnits = stock.getUnit();
+        assertEquals(0, remainingUnits, "Stock should be updated to 0 units even when the update value is excessively negative");
     }
 }
