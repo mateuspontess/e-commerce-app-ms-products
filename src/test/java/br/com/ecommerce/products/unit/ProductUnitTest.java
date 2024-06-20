@@ -21,7 +21,7 @@ import br.com.ecommerce.products.utils.RandomUtils;
 public class ProductUnitTest {
 
     @Test
-    @DisplayName("Unit - createProduct - Product must not be created with invalid name entry")
+    @DisplayName("Unit - createProduct - Product must not be created with blank/null name entry")
     void createProductTest01() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product(null, "Description", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
@@ -30,7 +30,7 @@ public class ProductUnitTest {
             () -> new Product("", "Description", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProduct - Product must not be created with invalid description entry")
+    @DisplayName("Unit - createProduct - Product must not be created with blank/null description entry")
     void createProductTest02() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", null, BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
@@ -39,7 +39,7 @@ public class ProductUnitTest {
             () -> new Product("Name", "", BigDecimal.TEN, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProduct - Product must not be created with invalid price entry")
+    @DisplayName("Unit - createProduct - Product must not be created with null/negative price entry")
     void createProductTest03() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", "Description", null, Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
@@ -48,16 +48,18 @@ public class ProductUnitTest {
             () -> new Product("Name", "Description", BigDecimal.valueOf(-1), Category.CPU, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProduct - Product must not be created with invalid category entry")
+    @DisplayName("Unit - createProduct - Product must not be created with null category entry")
     void createProductTest04() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", "Description", BigDecimal.TEN, null, new Stock(), new Manufacturer(), List.of(new ProductSpec())));
     }
     @Test
-    @DisplayName("Unit - createProduct - Product must not be created with invalid stock, manufacturer and specs entries")
+    @DisplayName("Unit - createProduct - Product must not be created with null/negative stock, manufacturer and specs entries")
     void createProductTest06() {
         assertThrows(IllegalArgumentException.class, 
             () -> new Product("Name", "Description", BigDecimal.TEN, Category.CPU, null, null, null));
+        assertThrows(IllegalArgumentException.class, 
+            () -> new Product("Name", "Description", BigDecimal.TEN, Category.CPU, new Stock(-100), null, null));
     }
     @Test
     @DisplayName("Unit - createProduct - Product must be created with valid entries")
@@ -70,8 +72,8 @@ public class ProductUnitTest {
     @DisplayName("Unit - update - Product must be updated with valid entries")
     void updateTest01() {
         // arrange
-        Product productDefault = RandomUtils.getRandomProduct();
-        Product dataForUpdate = RandomUtils.getRandomProduct();
+        Product productDefault = RandomUtils.getRandomProduct(true);
+        Product dataForUpdate = RandomUtils.getRandomProduct(true);
 
         // act
         productDefault.update(dataForUpdate);
@@ -87,7 +89,7 @@ public class ProductUnitTest {
     @DisplayName("Unit - update - Only name and description must not be updated")
     void updateTest02() {
         // arrange
-        Product productDefault = RandomUtils.getRandomProduct();
+        Product productDefault = RandomUtils.getRandomProduct(true);
         Product dataForUpdate = Product.builder()
             .name("")
             .description("")
@@ -111,7 +113,7 @@ public class ProductUnitTest {
     @DisplayName("Unit - update - Product must not updated with invalid entries")
     void updateTest03() {
         // arrange
-        Product productDefault = RandomUtils.getRandomProduct();
+        Product productDefault = RandomUtils.getRandomProduct(true);
         Product dataForUpdate = Product.builder()
             .name("")
             .description("")
