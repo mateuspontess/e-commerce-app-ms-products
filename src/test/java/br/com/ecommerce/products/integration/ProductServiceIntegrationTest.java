@@ -27,7 +27,6 @@ import br.com.ecommerce.products.model.product.Category;
 import br.com.ecommerce.products.model.product.Product;
 import br.com.ecommerce.products.model.product.ProductDTO;
 import br.com.ecommerce.products.model.product.ProductIdAndUnitsDTO;
-import br.com.ecommerce.products.model.product.ProductResponseDTO;
 import br.com.ecommerce.products.model.product.ProductSpec;
 import br.com.ecommerce.products.model.product.ProductSpecDTO;
 import br.com.ecommerce.products.model.product.ProductUpdateDTO;

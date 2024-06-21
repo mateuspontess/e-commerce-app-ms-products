@@ -1,16 +1,17 @@
 package br.com.ecommerce.products;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import br.com.ecommerce.products.testcontainers.MySQLTestContainerConfig;
 import br.com.ecommerce.products.testcontainers.RabbitMQTestContainerConfig;
 
 @SpringBootTest
-@TestPropertySource(properties = "classpath:application-test.properties")
-@ContextConfiguration(classes = {MySQLTestContainerConfig.class, RabbitMQTestContainerConfig.class})
+@TestPropertySource(properties = {"eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false"})
+@AutoConfigureTestDatabase
+@ContextConfiguration(classes = {RabbitMQTestContainerConfig.class})
 class ProductsApplicationTests {
 	
 	@Test
