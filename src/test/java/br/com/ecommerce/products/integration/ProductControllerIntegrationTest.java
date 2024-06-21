@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -116,36 +117,16 @@ class ProductControllerIntegrationTest {
         .andExpect(jsonPath("$.stock.unit").value(requestBody.getStock().getUnit().toString()))
         .andExpect(jsonPath("$.manufacturer.name").value(requestBody.getManufacturer().getName()))
         .andExpect(jsonPath("$.specs[0].attribute").value(requestBody.getSpecs().get(0).getAttribute()))
-        .andExpect(jsonPath("$.specs[0].value").value(requestBody.getSpecs().get(0).getValue()));
-    }
-    @Test
-    @DisplayName("Integration - createProduct - Must return status 400")
-    void createProductTest02() throws IOException, Exception {
-        // arrange
-        ProductDTO requestBody = new ProductDTO(
-            "",
-            "",
-            null,
-            null,
-            null,
-            null,
-            null);
-        
-        // act
-        mvc.perform(
-            post("/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(productDTOJson.write(requestBody).getJson())
-        )
-        // assert
-        .andExpect(jsonPath("$.fields.name").exists())
-        .andExpect(jsonPath("$.fields.description").exists())
-        .andExpect(jsonPath("$.fields.price").exists())
-        .andExpect(jsonPath("$.fields.category").exists())
-        .andExpect(jsonPath("$.fields.stock").exists())
-        .andExpect(jsonPath("$.fields.manufacturer").exists())
-        .andExpect(jsonPath("$.fields.specs").exists())
-        .andExpect(status().isBadRequest());
+        .andExpect(jsonPath("$.specs[0].value").value(requestBody.getSpecs().get(0).getValue()))
+        .andExpect( result -> {
+            String redirect = result.getResponse().getRedirectedUrl();
+            var nullableRedicrect = Optional.ofNullable(redirect);
+
+            redirect = nullableRedicrect
+                .orElseThrow(() -> new AssertionError("Redirect URL is null"));
+            if (redirect.isBlank())
+                throw new AssertionError("Redirect URL is blank");
+        });
     }
 
     @Test

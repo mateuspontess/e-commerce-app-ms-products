@@ -47,7 +47,7 @@ class ManufacturerControllerUnitTest {
 
 
     @Test
-    @DisplayName("Unit - createManufacturer - Must return status 200")
+    @DisplayName("Unit - createManufacturer - Must return status 200 and Manufacturer data")
     void createManufacturerTest01() throws IOException, Exception {
         // arrange
         ManufacturerDTO requestBody = new ManufacturerDTO("AMD");
@@ -68,7 +68,7 @@ class ManufacturerControllerUnitTest {
         verify(service).saveManufacturer(any());
     }
     @Test
-    @DisplayName("Unit - createManufacturer - Must return status 400 when request body is invalid")
+    @DisplayName("Unit - createManufacturer - Must return status 400 and field erros")
     void createManufacturerTest02() throws IOException, Exception {
         // arrange
         ManufacturerDTO invalidRequestBody = new ManufacturerDTO("");
@@ -80,7 +80,8 @@ class ManufacturerControllerUnitTest {
                 .content(manufacturerDTOJson.write(invalidRequestBody).getJson())
         )
         // assert
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.fields.name").exists());
 
         verifyNoInteractions(service);
     }

@@ -160,6 +160,7 @@ class ProductServiceUnitTest {
         assertEquals(1, result.size());
         assertEquals(result.get(0).getId(), products.get(1).getId());
     }
+    
     @Test
     @DisplayName("Unit - getAllProductsByListOfIds - Must return all products by list of IDs")
     void getAllProductsByListOfIds01() {

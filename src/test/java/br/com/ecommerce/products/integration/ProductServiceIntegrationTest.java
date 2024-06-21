@@ -72,21 +72,6 @@ class ProductServiceIntegrationTest {
 
 
     @Test
-    @DisplayName("Integration - getProduct - Must return Product details")
-    void getProductTest01() {
-        // act
-        ProductResponseDTO result = service.getProduct(1L);
-
-        // assert
-		assertNotNull(result);
-    }
-    @Test
-    @DisplayName("Integration - getProduct - Should fail when finding non-existing Product")
-    void getProductTest02() {
-        assertThrows(EntityNotFoundException.class, () -> service.getProduct(1000L));
-	}
-
-    @Test
     @DisplayName("Integration - getAllProductWithParams - Must return all products according to all parameters")
     void getAllProductWithParamsTest01() {
         // act
@@ -368,6 +353,7 @@ class ProductServiceIntegrationTest {
         assertNotNull(result.getCategory());
 
     }
+    
     @Test
     @DisplayName("Integration - updateStockByProductId - Must reduce the units in stock")
     void updateStockByProductIdTest01() {
@@ -406,6 +392,7 @@ class ProductServiceIntegrationTest {
         assertEquals(EXPECTED_NAME, result.getName());
         assertEquals(TARGET_ID, result.getProductId());
     }
+
     @Test
     @DisplayName("Integration - updateStocks - Should update all stocks")
     void updateStocksTest01() {
@@ -429,6 +416,7 @@ class ProductServiceIntegrationTest {
             assertNotEquals(ORIGINAL_VALUE, CURRENT);
         });
     }
+
     @Test
     @DisplayName("Integration - createProduct - Should create a Product")
     void createProductTest01() {

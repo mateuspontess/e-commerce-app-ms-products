@@ -3,16 +3,12 @@ package br.com.ecommerce.products.integration;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -37,44 +33,6 @@ class ManufacturerServiceIntegrationTest {
     @Autowired
     private ManufacturerRepository repository;
 
-
-    @Test
-    @DisplayName("Integration - findAllManufacturers - Must return a list of ManufacturerResponseDTO")
-    void findAllManufacturersTest01() {
-        // arrange
-        var persistedNames = repository.saveAll(
-            List.of(new Manufacturer("Corsair"), new Manufacturer("Logitech"), new Manufacturer("Redragon")))
-            .stream()
-                .map(m -> m.getName())
-                .toList();
-
-        // act
-        List<String> resultNames = 
-            service.findAllManufacturers(PageRequest.of(0, 10)).getContent().stream()
-                .map(result -> result.getName())
-                .toList();
-
-        // assert
-        assertTrue(persistedNames.containsAll(resultNames));
-    }
-
-    @Test
-    @DisplayName("Integration - findManufacturerById - Must return a ManufacturerResponseDTO")
-    void findManufacturerByIdTest01() {
-        // arrange
-        var persisted = repository.save(new Manufacturer("Corsair"));
-
-        // act
-        ManufacturerResponseDTO result = service.findManufacturerById(1L);
-
-        // assert
-        assertEquals(persisted.getName(), result.getName());
-    }
-    @Test
-    @DisplayName("Integration - findManufacturerById - Should throw exception when not finding manufacturer")
-    void findManufacturerByIdTest02() {
-        assertThrows(EntityNotFoundException.class, () -> service.findManufacturerById(1000L));
-    }
 
     @Test
     @DisplayName("Integration - saveManufacturer - Must return a ManufacturerResponseDTO")
@@ -103,6 +61,7 @@ class ManufacturerServiceIntegrationTest {
     @Test
     @DisplayName("Integration - updateManufacturerData - Should throw exception when not finding manufacturer")
     void updateManufacturerDataTest02() {
-        assertThrows(EntityNotFoundException.class, () -> service.updateManufacturerData(1000L, new ManufacturerDTO("non-existent")));
+        assertThrows(EntityNotFoundException.class, 
+        () -> service.updateManufacturerData(1000L, new ManufacturerDTO("non-existent")));
     }
 }

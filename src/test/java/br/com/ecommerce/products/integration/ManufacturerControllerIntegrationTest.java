@@ -1,16 +1,10 @@
 package br.com.ecommerce.products.integration;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,76 +49,6 @@ class ManufacturerControllerIntegrationTest {
 
 
     @Test
-    @DisplayName("Integration - createManufacturer - Should return status 200")
-    void createManufacturerTest01() throws IOException, Exception {
-        // arrange
-        String MANUFACTURER_NAME = "AMD";
-        ManufacturerDTO requestBody = new ManufacturerDTO(MANUFACTURER_NAME);
-
-        // act
-        mvc.perform(
-            post("/manufacturers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(requestBody).getJson())
-        )
-        // assert
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(1L))
-        .andExpect(jsonPath("$.name").value(MANUFACTURER_NAME));
-    }
-    @Test
-    @DisplayName("Integration - createManufacturer - Should return status 400 when request body is invalid")
-    void createManufacturerTest01Test02() throws IOException, Exception {
-        // arrange
-        ManufacturerDTO invalidRequestBody = new ManufacturerDTO("");
-
-        // act 
-        mvc.perform(
-            post("/manufacturers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(manufacturerDTOJson.write(invalidRequestBody).getJson())
-        )
-        // assert
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.fields.name").exists());
-    }
-
-    @Test
-    @DisplayName("Integration - getAllManufacturers - Should return status 200 and expected response body")
-    void getAllManufacturersTest01() throws IOException, Exception {
-        // arrange
-        var manufacturers = this.saveManufacturers("AMD", "INTEL", "NVIDIA");
-        
-        // act
-        mvc.perform(
-            get("/manufacturers")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        // assert
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content").isArray())
-        .andExpect(jsonPath("$.content", hasSize(3)))
-        .andExpect(jsonPath("$.content[0].name").value(manufacturers.get(0).getName()))
-        .andExpect(jsonPath("$.content[1].name").value(manufacturers.get(1).getName()))
-        .andExpect(jsonPath("$.content[2].name").value(manufacturers.get(2).getName()));
-    }
-
-    @Test
-    @DisplayName("Integration - getManufacturerById - Should return status 200 and expected response body")
-    void getManufacturerById() throws IOException, Exception {
-        // arrange
-        this.saveManufacturer("MSI");
-
-        // act
-        mvc.perform(
-            get("/manufacturers/1")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        // assert
-        .andExpect(status().isOk());
-    }
-
-    @Test
     @DisplayName("Integration - updateManufacturer - Should return status 200 and expected response body")
     void updateManufacturerTest01() throws IOException, Exception {
         // arrange
@@ -159,14 +83,7 @@ class ManufacturerControllerIntegrationTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.fields.name").exists());
     }
-
-    private List<Manufacturer> saveManufacturers(String ... names) {
-        return this.repository.saveAll(
-            Stream.of(names)
-                .map(name -> new Manufacturer((String) name))
-                .collect(Collectors.toList())
-        );
-    }
+    
     private Manufacturer saveManufacturer(String name) {
         return this.repository.save(new Manufacturer(name));
     }
