@@ -17,7 +17,7 @@ public class RandomUtils {
     
     private static Random random = new Random();
 
-    static Product createProduct(Manufacturer manufacturer, long id, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
+    static Product createProduct(Manufacturer manufacturer, Long id, String name, String description, BigDecimal price, Category category, int stockUnits, String specAttribute, String specValue) {
         ProductSpec spec = new ProductSpec(specAttribute, specValue);
         Product product = Product.builder()
             .id(id)
@@ -37,6 +37,19 @@ public class RandomUtils {
         return createProduct(
             new Manufacturer(getRandomString()),
             randomIdOrNull(withId),
+            getRandomString(), 
+            getRandomString(), 
+            getRandomBigDecimal(), 
+            getRandomCategory(), 
+            getRandomInt(), 
+            getRandomString(), 
+            getRandomString()
+        );
+    }
+    public static Product getRandomProduct(List<Manufacturer> manufacturers) {
+        return createProduct(
+            getRandomManufacturer(manufacturers),
+            randomIdOrNull(false),
             getRandomString(), 
             getRandomString(), 
             getRandomBigDecimal(), 
@@ -83,5 +96,8 @@ public class RandomUtils {
     public static Category getRandomCategory() {
         Category[] constants = Category.values();
         return constants[random.nextInt(constants.length)];
+    }
+    public static Manufacturer getRandomManufacturer(List<Manufacturer> manufacturers) {
+        return manufacturers.get(random.nextInt(manufacturers.size()));
     }
 }
